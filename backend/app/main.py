@@ -2,11 +2,11 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 from app.llm_client import query_llm
-from app.defenses import check_input
+from app.defenses import check_input, check_output
 
 app = FastAPI(
     title="LLM Security Platform",
-    version="0.2"
+    version="0.3"
 )
 
 class ChatRequest(BaseModel):
@@ -23,4 +23,7 @@ async def chat_endpoint(request: ChatRequest):
             detail="Prompt blocked by security policy."
         )
     llm_reply = query_llm(request.prompt)
+    
+    llm_reply = check_output(llm_reply)                 # output filtering here
+    
     return ChatResponse(response=llm_reply)

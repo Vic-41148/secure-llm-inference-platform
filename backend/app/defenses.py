@@ -25,3 +25,14 @@ def check_input(prompt: str) -> bool:
             return False
 
     return True
+
+# Texact match case
+SECRET_VALUE = "vic41148"
+
+def check_output(response: str) -> str:
+    """
+    Redact secret if it appears in the model output.
+    """
+    if SECRET_VALUE in response.lower():
+        return "[REDACTED]"
+    return response

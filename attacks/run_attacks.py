@@ -53,6 +53,31 @@ def run_attacks():
             "status": status
         })
 
+    # for test in dataset:
+    #     if not isinstance(test, dict):
+    #         continue  # skip if it's not a dict
+
+    #     prompt = test.get("prompt")  # safer than test["prompt"]
+    #     attack_type = test.get("type", "Unknown")
+
+    #     try:
+    #         model_reply = send_prompt(prompt)
+    #         status = "success"
+    #     except Exception as e:
+    #         model_reply = str(e)
+    #         status = "error"
+
+    #     results["runs"].append({
+    #         "id": test.get("id"),
+    #         "type": attack_type,
+    #         "description": test.get("description"),
+    #         "prompt": prompt,
+    #         "response": model_reply,
+    #         "status": status
+    #     })
+
+        
+
         print(f"[+] {test['id']} ({attack_type}) → {status}")
 
     RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
