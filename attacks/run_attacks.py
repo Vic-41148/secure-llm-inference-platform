@@ -19,7 +19,7 @@ def send_prompt(prompt: str) -> str:
     response = requests.post(
         API_URL,
         json={"prompt": prompt},
-        timeout=30
+        timeout=90
     )
     response.raise_for_status()
     return response.json()["response"]
