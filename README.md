@@ -78,6 +78,25 @@ The system follows a pipeline approach:
 * Real-time toggle for **Defense ON/OFF**.
 * Visual metrics comparing attack success rates.
 * Live chat log with security flagging.
+---
+## 🧪 Synopsis Evaluation  
+**Date:** 2026-01-31  
+
+**Evaluation Focus:**  
+Real-time detection using prompt classification (benign vs malicious) combined with rule-based and ML/LLM-based filters before inference. Emphasis on logging, risk scoring, and adaptive blocking to assess enterprise readiness.
+
+### Evaluation Checklist (Current Status)
+
+- ❌ Real-time prompt classification (Benign vs Malicious)  
+- ❌ Rule-based pre-inference filtering  
+- ❌ ML/LLM-based pre-inference filtering  
+- ❌ Combined hybrid detection pipeline (Rules + ML)  
+- ❌ Centralized logging of prompts and decisions  
+- ❌ Risk scoring per request  
+- ❌ Adaptive blocking based on risk thresholds  
+- ❌ Enterprise-ready monitoring & audit trail  
+
+**Last Evaluation Conducted:** 31 January 2026
 
 ---
 
