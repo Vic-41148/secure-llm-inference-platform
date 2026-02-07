@@ -1,10 +1,50 @@
 # 🛡️ NEURO-SENTRY DEFENSE SYSTEM
-
 ## Complete Full-Stack LLM Security Platform
 
-**v2.0.0 - COMPLETE EDITION**
+<img src="src/banner.png" alt="Project Banner / Dashboard Screenshot Placeholder" style="display:block;max-width:400px;width:80%;height:auto;margin:auto;">
 
-Everything included. No external dependencies. One command to run.
+> **A systematic framework for simulating, detecting, and mitigating prompt injection and jailbreak attacks on Large Language Models.**
+
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.95-green)
+![React](https://img.shields.io/badge/Frontend-React-cyan)
+![Ollama](https://img.shields.io/badge/LLM-Ollama%2FLocal-orange)
+![Status](https://img.shields.io/badge/Status-Active_Development-brightgreen)
+
+---
+
+## 🏫 Project & Academic Details
+
+**Institution:** [KR Mangalam University](https://www.krmangalam.edu.in/)  
+**Course:** BCA (AI & Data Science)  
+**Semester:** 4  
+**Internal Coordinator:** Dr. Ravinder Beniwal  
+**Email:** ravinder.beniwal@krmangalam.edu.in  
+
+<img src="https://cdn-ilakggn.nitrocdn.com/qfLlPHxtFDGRhIOUKhiZcDNvbHvEtWcT/assets/images/optimized/rev-5a3e233/www.krmangalam.edu.in/wp-content/uploads/2025/11/KRMU-Logo-NAAC.webp" alt="KRMU Logo" style="display:block;max-width:300px;width:90%;height:auto;">
+
+---
+
+### 👥 The Team
+
+| Name | Roll Number | Role |
+| :--- | :--- | :--- |
+| **Aditya Shibu** | 2401201047 | **Team Leader** / Backend Architect / Attack Simulation / Red Teaming |
+| **Akash Sharma** | 2401201108 | Defense Logic / Blue Teaming |
+| **Bhavya Rattan, Lakshya Dangwal** | 2401201004 | Frontend & Visualization |
+
+---
+
+## 📖 Project Overview
+
+As Large Language Models (LLMs) like GPT-4 and Llama-3 become integral to software, they introduce critical security vulnerabilities. **Prompt Injection** and **Jailbreaking** allow malicious users to manipulate LLM outputs, bypass safety filters, and leak sensitive data.
+
+**NEURO-SENTRY DEFENSE SYSTEM** (formerly LLM-Guard) is a complete full-stack platform designed to:
+1. **Demonstrate** vulnerabilities in standard LLM deployments
+2. **Simulate** real-world attacks (DAN, Roleplay, Obfuscation)
+3. **Implement** layered defense mechanisms (Sanitization, Vector Analysis)
+4. **Evaluate** security performance using quantitative metrics
+5. **Provide** direct LLM interaction with real-time threat detection
 
 ---
 
@@ -75,22 +115,51 @@ neuro-sentry-merged/
 
 ---
 
-## 🚀 How It Works
+## 🚀 Key Features
 
-### The Launcher Does Everything:
+### 🔴 Red Team (Attack Engine)
+* **Direct Injection:** Overriding system prompts to force unintended behaviors
+* **Jailbreak Library:** Automated testing of known jailbreaks (e.g., DAN, Mongo Tom)
+* **RAG Poisoning:** Simulating indirect injections via compromised document retrieval
+* **Attack Lab:** Interactive testing interface with pre-built attack vectors
 
-1. ✅ Checks Node.js, Python, Ollama
-2. ✅ Detects Ollama models (prefers llama3-gpu for GPU)
-3. ✅ Downloads llama3 if missing
-4. ✅ Installs frontend dependencies
-5. ✅ Sets up Python venv
-6. ✅ Installs backend dependencies
-7. ✅ Starts Ollama
-8. ✅ Starts FastAPI backend
-9. ✅ Starts Vite frontend
-10. ✅ Opens your browser
+### 🔵 Blue Team (Defense Layer)
+* **Context Isolation:** Separating user data from system instructions
+* **Input Filtering:** Detecting aggressive or manipulative patterns before inference
+* **PII Redaction:** Automatically masking sensitive data in outputs
+* **Real-time Detection:** Live threat detection with security toggle (ON/OFF)
 
-**You just run: `./start-all.sh`**
+### 📊 Analytics Dashboard
+* Real-time toggle for **Defense ON/OFF**
+* Visual metrics comparing attack success rates
+* Live chat log with security flagging
+* System metrics and health monitoring
+
+### 💬 Direct Neural Link
+* **Live LLM Chat:** Direct interaction with local LLM (llama3-gpu preferred)
+* **Real-time Streaming:** Immediate responses with no filtering
+* **Connection Status:** Real-time monitoring of LLM connectivity
+
+---
+
+## 🧪 Synopsis Evaluation  
+**Date:** 2026-01-31  
+
+**Evaluation Focus:**  
+Real-time detection using prompt classification (benign vs malicious) combined with rule-based and ML/LLM-based filters before inference. Emphasis on logging, risk scoring, and adaptive blocking to assess enterprise readiness.
+
+### Evaluation Checklist (Current Status)
+
+- ❌ Real-time prompt classification (Benign vs Malicious)  
+- ❌ Rule-based pre-inference filtering  
+- ❌ ML/LLM-based pre-inference filtering  
+- ❌ Combined hybrid detection pipeline (Rules + ML)  
+- ❌ Centralized logging of prompts and decisions  
+- ❌ Risk scoring per request  
+- ❌ Adaptive blocking based on risk thresholds  
+- ❌ Enterprise-ready monitoring & audit trail  
+
+**Last Evaluation Conducted:** 31 January 2026
 
 ---
 
@@ -117,44 +186,16 @@ The backend will automatically use `llama3-gpu` for maximum performance!
 
 ---
 
-## 📊 Features
+## 📡 API Endpoints
 
-### Command Center
-- System metrics dashboard
-- Defense integrity monitoring
-- Threat vector analysis
-- Real-time statistics
+The backend exposes:
 
-### Attack Lab
-- Test prompt injections
-- Jailbreak simulations
-- Security toggle (ON/OFF)
-- Live threat detection
-- **Real LLM responses via backend**
-
-### Direct Neural Link
-- **NEW**: Direct chat with your LLM
-- Uses llama3-gpu for fast responses
-- No filtering (raw access)
-- Real-time streaming
-- Connection status indicator
-
-### Console
-- Live system logs
-- Color-coded messages
-- Auto-scroll
-- Terminal aesthetic
-
----
-
-## 🔧 Configuration
-
-Everything is auto-configured. No manual setup needed.
-
-**Optional:** Edit `.env` to change API URL:
-```env
-VITE_API_URL=http://localhost:8000
-```
+- `GET /` - Service info
+- `GET /health` - Health + model info
+- `POST /chat` - Direct LLM chat (Direct Neural Link)
+- `POST /api/prompt` - Security analysis (Attack Lab)
+- `GET /api/stats` - Statistics
+- `GET /api/logs` - Recent logs
 
 ---
 
@@ -173,6 +214,18 @@ tail -f backend/logs/backend_*.log
 - LLM responses
 - Threat detections
 - Errors and warnings
+
+---
+
+## 🛠️ Technology Stack
+
+* **Core Logic:** Python 3.10
+* **API Framework:** FastAPI + Uvicorn
+* **Model Runtime:** Ollama (Local Inference)
+* **LLMs Used:** LLaMA-3, Mistral
+* **Vector Database:** FAISS (for RAG experiments)
+* **Frontend:** React.js + Tailwind CSS + Vite
+* **Tools:** Postman, Git, VS Code
 
 ---
 
@@ -239,19 +292,6 @@ cat logs/backend_*.log  # Check the logs
 ### Toggle Security
 - Green button = Defense ON (blocks threats)
 - Red button = Defense OFF (allows everything)
-
----
-
-## 📡 API Endpoints
-
-The backend exposes:
-
-- `GET /` - Service info
-- `GET /health` - Health + model info
-- `POST /chat` - Direct LLM chat (Direct Neural Link)
-- `POST /api/prompt` - Security analysis (Attack Lab)
-- `GET /api/stats` - Statistics
-- `GET /api/logs` - Recent logs
 
 ---
 
