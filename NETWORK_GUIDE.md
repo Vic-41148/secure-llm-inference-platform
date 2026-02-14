@@ -193,7 +193,7 @@ Just use `http://localhost:5173` as before - everything works the same!
 ## 🎨 Features Overview
 
 ### Auto-Detection
-The API service automatically determines the right URL:
+The API service automatically determines the right url:
 - Localhost → `http://localhost:8000`
 - Network → `http://YOUR_IP:8000`
 
