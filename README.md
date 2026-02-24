@@ -17,15 +17,15 @@
 
 ## 🏫 Project & Academic Details
 
-**Institution:** [KR Mangalam University](https://www.krmangalam.edu.in/)  
+**Institution:** [KR Mangalam University](https://www.krmangalam.edu.in/)  
 
-**Course:** BCA (AI & Data Science)  
+**Course:** BCA (AI & Data Science)  
 
-**Semester:** 4  
+**Semester:** 4  
 
-**Internal Coordinator:** Dr. Ravinder Beniwal  
+**Internal Coordinator:** Dr. Ravinder Beniwal  
 
-**Email:** ravinder.beniwal@krmangalam.edu.in  
+**Email:** ravinder.beniwal@krmangalam.edu.in  
 
 
 <img src="https://cdn-ilakggn.nitrocdn.com/qfLlPHxtFDGRhIOUKhiZcDNvbHvEtWcT/assets/images/optimized/rev-5a3e233/www.krmangalam.edu.in/wp-content/uploads/2025/11/KRMU-Logo-NAAC.webp" alt="KRMU Logo" style="display:block;max-width:300px;width:90%;height:auto;">
@@ -55,23 +55,58 @@ As Large Language Models (LLMs) like GPT-4 and Llama-3 become integral to softwa
 
 ---
 
-## ⚡ Quick Start (3 Steps)
+## ⚡ Quick Start
 
-### 1. Install Ollama
+### 🐧 Linux / macOS
 
+**Step 1 — Install Ollama**
 ```bash
 curl https://ollama.ai/install.sh | sh
 ```
 
-### 2. Extract and Run
+**Step 2 — Make the launcher executable** *(only needed once after cloning/extracting)*
+```bash
+chmod +x start-all.sh
+```
 
+**Step 3 — Run**
 ```bash
 cd neuro-sentry-merged
 ./start-all.sh
 ```
 
-### 3. Done!
+**Step 4 — Done!**  
+Open http://localhost:5173
 
+---
+
+### 🪟 Windows
+
+**Step 1 — Install Ollama**  
+Download and run the installer from: https://ollama.ai
+
+**Step 2 — Run**
+
+**Option A — Batch file (recommended, no extra setup):**
+```cmd
+cd neuro-sentry-merged
+start-all.bat
+```
+
+**Option B — PowerShell script:**
+
+If you get a *"script cannot be loaded because running scripts is disabled"* error, you need to allow script execution first. Open PowerShell **as Administrator** and run once:
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+Then launch normally:
+```powershell
+cd neuro-sentry-merged
+.\start-all.ps1
+```
+> ℹ️ `RemoteSigned` allows local scripts to run while still blocking unsigned scripts downloaded from the internet. You only need to set this once.
+
+**Step 3 — Done!**  
 Open http://localhost:5173
 
 ---
@@ -116,7 +151,9 @@ neuro-sentry-merged/
 │   │   └── main.py        # Auto-detecting backend
 │   ├── logs/              # All logs go here
 │   └── requirements.txt
-├── start-all.sh           # Launch everything
+├── start-all.sh           # Linux/macOS launcher
+├── start-all.bat          # Windows launcher (batch)
+├── start-all.ps1          # Windows launcher (PowerShell)
 └── README.md              # This file
 ```
 
@@ -149,22 +186,22 @@ neuro-sentry-merged/
 
 ---
 
-## 🧪 Synopsis Evaluation  
-**Date:** 2026-01-31  
+## 🧪 Synopsis Evaluation  
+**Date:** 2026-01-31  
 
-**Evaluation Focus:**  
+**Evaluation Focus:**  
 Real-time detection using prompt classification (benign vs malicious) combined with rule-based and ML/LLM-based filters before inference. Emphasis on logging, risk scoring, and adaptive blocking to assess enterprise readiness.
 
 ### Evaluation Checklist (Current Status)
 
-- ❌ Real-time prompt classification (Benign vs Malicious)  
-- ❌ Rule-based pre-inference filtering  
-- ❌ ML/LLM-based pre-inference filtering  
-- ❌ Combined hybrid detection pipeline (Rules + ML)  
-- ❌ Centralized logging of prompts and decisions  
-- ❌ Risk scoring per request  
-- ❌ Adaptive blocking based on risk thresholds  
-- ❌ Enterprise-ready monitoring & audit trail  
+- ❌ Real-time prompt classification (Benign vs Malicious)  
+- ❌ Rule-based pre-inference filtering  
+- ❌ ML/LLM-based pre-inference filtering  
+- ❌ Combined hybrid detection pipeline (Rules + ML)  
+- ❌ Centralized logging of prompts and decisions  
+- ❌ Risk scoring per request  
+- ❌ Adaptive blocking based on risk thresholds  
+- ❌ Enterprise-ready monitoring & audit trail  
 
 **Last Evaluation Conducted:** 31 January 2026
 
@@ -263,9 +300,23 @@ tail -f backend/logs/backend_*.log
 
 ### Common Issues
 
+**"Permission denied" when running `./start-all.sh`** *(Linux/macOS)*
+```bash
+chmod +x start-all.sh
+```
+
 **"Ollama not found"**
 ```bash
+# Linux/macOS
 curl https://ollama.ai/install.sh | sh
+
+# Windows: download installer from https://ollama.ai
+```
+
+**"Script cannot be loaded"** *(Windows PowerShell only — use start-all.bat to avoid this)*
+```powershell
+# Run PowerShell as Administrator, then:
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 **"Backend won't start"**
@@ -326,7 +377,7 @@ Total disk space: ~5GB for model + dependencies
 
 ## ✅ Verification Checklist
 
-After running `./start-all.sh`:
+After running the launcher:
 
 - [ ] Ollama detected your llama3-gpu model
 - [ ] Backend started successfully
@@ -341,7 +392,7 @@ After running `./start-all.sh`:
 ## 🆕 What's New in v2.0
 
 ✨ **Auto-Detection** - Finds best Ollama model automatically  
-🚀 **One Command** - `./start-all.sh` does everything  
+🚀 **One Command** - Launcher does everything  
 📝 **Comprehensive Logging** - Every action logged to files  
 ⚡ **GPU Support** - Automatically uses llama3-gpu if available  
 💬 **Direct Neural Link** - Live chat with your LLM  
@@ -367,10 +418,15 @@ curl http://localhost:8000/health
 
 ## 🎉 That's It!
 
-One command. Full stack. Real LLM responses.
-
+**Linux/macOS** — one-time setup, then just run:
 ```bash
+chmod +x start-all.sh  # first time only
 ./start-all.sh
+```
+
+**Windows** — just double-click or run:
+```cmd
+start-all.bat
 ```
 
 **Welcome to the Matrix.** 🛡️
