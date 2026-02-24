@@ -106,6 +106,3 @@ const StatusCard = ({ isDefending, isProcessing, isBreached }) => {
 };
 
 export default StatusCard;
-};
-
-export default StatusCard;
