@@ -4,110 +4,307 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/* ============================================================
+   CSS VARIABLES — DARK MODE (default)
+   ============================================================ */
+:root,
+html.dark {
   color-scheme: dark;
+
+  --bg-primary: linear-gradient(135deg, #0a0a0a 0%, #050505 50%, #0a0a0a 100%);
+  --bg-body: #0a0a0a;
+
+  --text-primary: #ffffff;
+  --text-secondary: #e2e8f0;
+  --text-muted: rgba(255,255,255,0.4);
+  --text-subtle: rgba(255,255,255,0.2);
+
+  --border-primary: rgba(255,255,255,0.08);
+  --border-accent: rgba(6,182,212,0.2);
+  --border-hover: rgba(255,255,255,0.2);
+
+  --card-bg: rgba(255,255,255,0.05);
+  --card-bg-hover: rgba(255,255,255,0.08);
+  --card-border: rgba(255,255,255,0.1);
+
+  --header-bg: rgba(0,0,0,0.5);
+  --sidebar-bg: rgba(0,0,0,0.3);
+  --console-bg: rgba(0,0,0,0.9);
+  --console-header-bg: rgba(0,0,0,0.5);
+  --console-text-muted: rgba(255,255,255,0.6);
+  --console-text-default: rgba(6,182,212,0.8);
+  --console-time: rgba(255,255,255,0.2);
+  --console-row-hover: rgba(255,255,255,0.05);
+  --panel-bg: rgba(0,0,0,0.4);
+
+  --dropdown-bg: #0d0d0d;
+  --dropdown-header: rgba(255,255,255,0.04);
+
+  --scrollbar-thumb: rgba(6,182,212,0.2);
+  --scrollbar-thumb-hover: rgba(6,182,212,0.4);
+
+  --grid-color: rgba(6,182,212,0.03);
+  --scanline-color: rgba(6,182,212,0.02);
 }
 
+/* ============================================================
+   CSS VARIABLES — LIGHT MODE
+   ============================================================ */
+html.light {
+  color-scheme: light;
+
+  --bg-primary: linear-gradient(135deg, #f0f4f8 0%, #e8edf5 50%, #f0f4f8 100%);
+  --bg-body: #f0f4f8;
+
+  --text-primary: #0f172a;
+  --text-secondary: #1e293b;
+  --text-muted: rgba(15,23,42,0.5);
+  --text-subtle: rgba(15,23,42,0.25);
+
+  --border-primary: rgba(15,23,42,0.1);
+  --border-accent: rgba(6,182,212,0.35);
+  --border-hover: rgba(15,23,42,0.25);
+
+  --card-bg: rgba(255,255,255,0.7);
+  --card-bg-hover: rgba(255,255,255,0.9);
+  --card-border: rgba(15,23,42,0.1);
+
+  --header-bg: rgba(240,244,248,0.85);
+  --sidebar-bg: rgba(255,255,255,0.6);
+  --console-bg: rgba(240,244,248,0.97);
+  --console-header-bg: rgba(220,228,240,0.8);
+  --console-text-muted: rgba(15,23,42,0.6);
+  --console-text-default: rgba(6,100,160,0.9);
+  --console-time: rgba(15,23,42,0.3);
+  --console-row-hover: rgba(15,23,42,0.05);
+  --panel-bg: rgba(255,255,255,0.6);
+
+  --dropdown-bg: #ffffff;
+  --dropdown-header: rgba(15,23,42,0.04);
+
+  --scrollbar-thumb: rgba(6,182,212,0.3);
+  --scrollbar-thumb-hover: rgba(6,182,212,0.5);
+
+  --grid-color: rgba(6,182,212,0.06);
+  --scanline-color: rgba(6,182,212,0.015);
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
 body {
   margin: 0;
   font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #0a0a0a 0%, #050505 50%, #0a0a0a 100%);
+  background: var(--bg-primary);
   background-attachment: fixed;
   overflow: hidden;
+  transition: background 0.4s ease, color 0.3s ease;
 }
 
-code,
-pre {
+code, pre {
   font-family: 'JetBrains Mono', 'Courier New', monospace;
 }
 
-/* Custom Scrollbar */
+/* ============================================================
+   THEME-AWARE UTILITY CLASSES
+   ============================================================ */
+.header-bg {
+  background: var(--header-bg);
+}
+
+.sidebar-bg {
+  background: var(--sidebar-bg);
+}
+
+.console-bg {
+  background: var(--console-bg);
+}
+
+.panel-bg {
+  background: var(--panel-bg);
+}
+
+.settings-dropdown {
+  background: var(--dropdown-bg);
+  backdrop-filter: blur(20px);
+}
+
+/* ============================================================
+   LIGHT MODE COMPONENT OVERRIDES
+   ============================================================ */
+
+/* Cards / glassmorphism */
+html.light .glass,
+html.light [class*="bg-black/"] {
+  background: rgba(255,255,255,0.6) !important;
+  border-color: rgba(15,23,42,0.1) !important;
+  backdrop-filter: blur(20px);
+}
+
+html.light [class*="bg-white/5"] {
+  background: rgba(15,23,42,0.04) !important;
+}
+html.light [class*="bg-white/10"] {
+  background: rgba(15,23,42,0.07) !important;
+}
+
+/* Text */
+html.light .text-white {
+  color: #0f172a !important;
+}
+html.light [class*="text-white/"] {
+  color: rgba(15,23,42,var(--tw-text-opacity, 0.8)) !important;
+}
+html.light .text-white\/40 { color: rgba(15,23,42,0.4) !important; }
+html.light .text-white\/50 { color: rgba(15,23,42,0.5) !important; }
+html.light .text-white\/60 { color: rgba(15,23,42,0.6) !important; }
+html.light .text-white\/70 { color: rgba(15,23,42,0.7) !important; }
+html.light .text-white\/80 { color: rgba(15,23,42,0.8) !important; }
+html.light .text-white\/90 { color: rgba(15,23,42,0.9) !important; }
+html.light .text-white\/20 { color: rgba(15,23,42,0.2) !important; }
+html.light .text-white\/30 { color: rgba(15,23,42,0.3) !important; }
+html.light .text-white\/10 { color: rgba(15,23,42,0.1) !important; }
+
+/* Borders */
+html.light [class*="border-white/"] {
+  border-color: rgba(15,23,42,0.1) !important;
+}
+html.light .border-white\/5  { border-color: rgba(15,23,42,0.05) !important; }
+html.light .border-white\/10 { border-color: rgba(15,23,42,0.1) !important; }
+
+/* Console panel follows theme via CSS variables */
+
+/* Placeholders */
+html.light ::placeholder {
+  color: rgba(15,23,42,0.35) !important;
+}
+
+/* Textareas & inputs */
+html.light textarea,
+html.light input {
+  background: rgba(255,255,255,0.8) !important;
+  color: #0f172a !important;
+  border-color: rgba(15,23,42,0.15) !important;
+}
+html.light textarea:focus,
+html.light input:focus {
+  border-color: rgba(6,182,212,0.6) !important;
+}
+
+/* Selection */
+html.light ::selection {
+  background: rgba(6,182,212,0.25);
+  color: #0f172a;
+}
+
+/* Neural grid & scanline — lighter in light mode */
+html.light body::before {
+  background-image:
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+}
+html.light body::after {
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    var(--scanline-color) 50%
+  );
+}
+
+/* Attack sidebar in light mode */
+html.light aside {
+  background: rgba(255,255,255,0.55) !important;
+  border-right-color: rgba(15,23,42,0.08) !important;
+}
+
+/* Tab bar */
+html.light [class*="border-b border-white/5 bg-white/5"] {
+  background: rgba(255,255,255,0.5) !important;
+  border-color: rgba(15,23,42,0.08) !important;
+}
+
+/* Inactive tab buttons */
+html.light .text-white\/40 {
+  color: rgba(15,23,42,0.4) !important;
+}
+
+/* Warning / info boxes */
+html.light [class*="bg-yellow-500/10"] {
+  background: rgba(251,191,36,0.12) !important;
+}
+
+/* Status card glow bg */
+html.light [class*="from-cyan-500/5"],
+html.light [class*="via-blue-500/5"],
+html.light [class*="to-purple-500/5"] {
+  opacity: 0.3;
+}
+
+/* Code blocks — keep emerald tint, just lighter bg */
+html.light [class*="bg-black/60"] {
+  background: rgba(15,23,42,0.06) !important;
+}
+html.light pre code {
+  color: #065f46 !important;
+}
+
+/* Gradient text — dark mode has white start, light mode slate */
+html.light .bg-clip-text.text-transparent {
+  background-image: linear-gradient(to right, #0f172a, #0e7490, #1d4ed8) !important;
+}
+
+/* Network panel floating button — keep vibrant */
+html.light .fixed.bottom-6.right-6 button {
+  box-shadow: 0 4px 24px rgba(6,182,212,0.25);
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: rgba(6, 182, 212, 0.2);
+  background: var(--scrollbar-thumb);
   border-radius: 10px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(6, 182, 212, 0.4);
+  background: var(--scrollbar-thumb-hover);
 }
 
-/* Gradient Text Animation */
-@keyframes gradient-flow {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient-flow 3s ease infinite;
-}
-
-/* Glow Effects */
-.glow-cyan {
-  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
-}
-
-.glow-emerald {
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-}
-
-.glow-red {
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
-}
-
-/* Glass Effect */
-.glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Neural Grid Background */
+/* ============================================================
+   NEURAL GRID (dark default, overridden in light above)
+   ============================================================ */
 body::before {
   content: '';
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-image:
+    linear-gradient(rgba(6,182,212,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6,182,212,0.03) 1px, transparent 1px);
   background-size: 50px 50px;
   pointer-events: none;
   z-index: 0;
+  transition: background-image 0.4s ease;
 }
 
-/* Scanline Effect */
+/* Scanline effect */
 body::after {
   content: '';
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background: linear-gradient(
     to bottom,
     transparent 50%,
-    rgba(6, 182, 212, 0.02) 50%
+    rgba(6,182,212,0.02) 50%
   );
   background-size: 100% 4px;
   pointer-events: none;
@@ -115,55 +312,96 @@ body::after {
   animation: scanline 8s linear infinite;
 }
 
-@keyframes scanline {
-  0% {
-    transform: translateY(0);
-  }
-  100% {
-    transform: translateY(4px);
-  }
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes gradient-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-flow 3s ease infinite;
 }
 
-/* Utility Classes */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* Selection */
-::selection {
-  background: rgba(6, 182, 212, 0.3);
-  color: white;
-}
-
-/* Animations */
 @keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
 }
-
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
 
-/* Pulse glow */
 @keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(6, 182, 212, 0.8);
-  }
+  0%, 100% { box-shadow: 0 0 5px rgba(6,182,212,0.5); }
+  50% { box-shadow: 0 0 20px rgba(6,182,212,0.8); }
 }
-
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px) rotate(-0.5deg); }
+  50% { transform: translateX(5px) rotate(0.5deg); }
+  75% { transform: translateX(-5px) rotate(-0.5deg); }
+}
+.animate-shake {
+  animation: shake 0.2s ease-in-out infinite;
+}
+
+@keyframes scanline {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+
+@keyframes scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+.animate-scan {
+  animation: scan 8s linear infinite;
+}
+
+/* ============================================================
+   GLOW EFFECTS
+   ============================================================ */
+.glow-cyan   { box-shadow: 0 0 20px rgba(6,182,212,0.3); }
+.glow-emerald { box-shadow: 0 0 20px rgba(16,185,129,0.3); }
+.glow-red    { box-shadow: 0 0 20px rgba(239,68,68,0.3); }
+
+/* Glass */
+.glass {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Scrollbar hide */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Selection (dark default) */
+::selection {
+  background: rgba(6,182,212,0.3);
+  color: white;
+}
+
+/* ============================================================
+   LIGHT MODE TRANSITION
+   ============================================================ */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 250ms;
+  transition-timing-function: ease;
+}
+/* Don't transition transforms/opacity (breaks animations) */
+[class*="animate-"] {
+  transition: none !important;
 }
