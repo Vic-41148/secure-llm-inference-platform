@@ -123,7 +123,7 @@ function AppInner() {
       <Header backendConnected={backendConnected} />
       <DefenseToggle isDefending={isDefending} onToggle={() => setIsDefending(!isDefending)} />
 
-      <div className="flex h-[calc(100vh-5rem-12rem)] overflow-hidden">
+<div className="flex h-[calc(100vh-5rem-12rem)] overflow-hidden mt-20">
         <AttackSidebar
           attacks={attacks}
           selectedId={selectedAttack.id}
