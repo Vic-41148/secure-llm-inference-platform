@@ -2,7 +2,7 @@ import React from 'react';
 
 const DefenseToggle = ({ isDefending, onToggle }) => {
   return (
-<div className="fixed top-44 left-1/2 z-40">
+<div style={{ position: 'fixed', top: '180px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999 }}>
   <div className="relative">
         {/* Glow effect */}
         <div
