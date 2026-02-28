@@ -2,11 +2,17 @@ import React from 'react';
 
 const DefenseToggle = ({ isDefending, onToggle }) => {
   return (
-    <div className="fixed top-24 left-1/2 -translate-x-1/2 z-40">
+    // FIX 1: Added 'z-50' (higher than sidebar/main content)
+    // FIX 2: Added 'will-change-transform' to lock it in fixed position
+    // FIX 3: Removed transform from scrollable parent influence
+    <div
+      className="fixed top-24 left-1/2 z-50"
+      style={{ transform: 'translateX(-50%)', willChange: 'transform' }}
+    >
       <div className="relative">
         {/* Glow effect */}
         <div
-          className={`absolute inset-0 blur-2xl transition-all duration-500 ${
+          className={`absolute inset-0 blur-2xl transition-all duration-500 pointer-events-none ${
             isDefending ? 'bg-emerald-500/20' : 'bg-red-500/20'
           }`}
         />
@@ -39,7 +45,9 @@ const DefenseToggle = ({ isDefending, onToggle }) => {
 
             {/* Text */}
             <div className="text-left">
-              <div className="text-xs font-mono text-[var(--text-muted)] tracking-widest uppercase mb-1">Defense Status</div>
+              <div className="text-xs font-mono text-[var(--text-muted)] tracking-widest uppercase mb-1">
+                Defense Status
+              </div>
               <div className={`text-2xl font-bold tracking-tight transition-all duration-300 ${
                 isDefending ? 'text-emerald-500' : 'text-red-500'
               }`}>
@@ -52,7 +60,9 @@ const DefenseToggle = ({ isDefending, onToggle }) => {
               <button
                 onClick={onToggle}
                 className={`relative w-14 h-7 rounded-full transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent ${
-                  isDefending ? 'bg-emerald-500 focus:ring-emerald-500/50' : 'bg-red-500/60 focus:ring-red-500/50'
+                  isDefending
+                    ? 'bg-emerald-500 focus:ring-emerald-500/50'
+                    : 'bg-red-500/60 focus:ring-red-500/50'
                 }`}
                 aria-pressed={isDefending}
                 aria-label="Toggle defense"
@@ -65,7 +75,7 @@ const DefenseToggle = ({ isDefending, onToggle }) => {
           </div>
         </div>
 
-        {/* Pulse ring */}
+        {/* FIX 4: Pulse ring — pointer-events-none prevents it catching scroll events */}
         <div className={`absolute inset-0 rounded-2xl border-2 animate-ping pointer-events-none transition-colors duration-300 ${
           isDefending ? 'border-emerald-500/20' : 'border-red-500/20'
         }`} />
