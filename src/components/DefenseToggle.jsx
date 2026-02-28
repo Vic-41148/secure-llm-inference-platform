@@ -2,8 +2,8 @@ import React from 'react';
 
 const DefenseToggle = ({ isDefending, onToggle }) => {
   return (
-    <div className="fixed top-24 left-1/2 -translate-x-1/2 z-40">
-      <div className="relative">
+<div className="fixed top-44 left-1/2 z-40">
+  <div className="relative">
         {/* Glow effect */}
         <div
           className={`absolute inset-0 blur-2xl transition-all duration-500 ${
