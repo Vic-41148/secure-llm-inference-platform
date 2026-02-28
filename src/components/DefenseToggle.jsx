@@ -2,7 +2,6 @@ import React from 'react';
 
 const DefenseToggle = ({ isDefending, onToggle }) => {
   return (
-    // Moved to RIGHT side — no longer overlaps the center tab bar
     <div
       className="fixed z-50"
       style={{
