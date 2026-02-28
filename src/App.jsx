@@ -119,13 +119,31 @@ function AppInner() {
   };
 
   return (
-    <div className={`min-h-screen text-[var(--text-primary)] font-sans selection:bg-cyan-500/30 transition-colors duration-300 ${isBreached ? 'animate-shake' : ''}`}>
+    // ROOT DIV: no transform, no animate class — keeps fixed children stable
+    <div className="min-h-screen text-[var(--text-primary)] font-sans selection:bg-cyan-500/30 transition-colors duration-300">
+
+      {/* BREACH EFFECT: separate fixed overlay — does NOT wrap any children
+          so its transform never breaks Header/DefenseToggle/Console positioning */}
+      {isBreached && (
+        <div
+          className="animate-shake pointer-events-none"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            border: '3px solid rgba(239,68,68,0.7)',
+            boxShadow: 'inset 0 0 60px rgba(239,68,68,0.15)',
+          }}
+        />
+      )}
 
       {/* Fixed header */}
       <Header backendConnected={backendConnected} />
 
       {/* Fixed defense toggle */}
       <DefenseToggle isDefending={isDefending} onToggle={() => setIsDefending(!isDefending)} />
+
+      {/* Main layout — mt-20 clears the fixed header */}
       <div className="mt-20 flex h-[calc(100vh-5rem-12rem)] overflow-hidden">
         <AttackSidebar
           attacks={attacks}
