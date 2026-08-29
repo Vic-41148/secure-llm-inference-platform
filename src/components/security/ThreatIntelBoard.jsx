@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ThreatCard from './ThreatCard';
-import { Globe } from 'lucide-react';
+import { Globe, Radio } from 'lucide-react';
 
 const DEMO_THREATS = [
     { id: 't1', actor: 'APT-29 (Cozy Bear)', severity: 'critical', type: 'Prompt Injection → Data Exfiltration', ioc: 'C2: 185.220.101.x / TTP: T1059.001' },
@@ -19,7 +19,6 @@ const ThreatIntelBoard = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Try backend first, fall back to demo data
         fetch('http://localhost:8000/api/threat-intel/')
             .then(res => res.json())
             .then(data => {
@@ -34,22 +33,30 @@ const ThreatIntelBoard = () => {
     }, []);
 
     return (
-        <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-md h-full flex flex-col">
-            <div className="flex items-center gap-2 mb-6 text-xl">
-                <Globe className="text-blue-500 w-6 h-6" />
-                <h2 className="font-bold text-gray-200">Global Threat Intelligence</h2>
-                <span className="ml-auto text-xs font-mono text-emerald-400 bg-emerald-900/30 px-2 py-1 rounded border border-emerald-800">{threats.length} ACTIVE</span>
+        <div className="p-8 space-y-6 h-full flex flex-col overflow-hidden">
+            <div className="glass-card p-6 rounded-2xl border border-[var(--border-accent)] flex items-center justify-between shadow-xl flex-shrink-0">
+                <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-blue-500/15 border border-blue-500/30 text-blue-500 flex items-center justify-center shadow-md">
+                        <Globe className="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-bold text-[var(--text-primary)]">Global Threat Intelligence</h2>
+                        <p className="text-xs text-[var(--text-muted)] font-mono mt-0.5">Live feeds of known malicious actors targeting LLM infrastructure</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs font-bold">
+                    <Radio className="w-3.5 h-3.5 animate-pulse text-emerald-400" />
+                    <span>{threats.length} FEEDS ACTIVE</span>
+                </div>
             </div>
 
-            <p className="text-sm text-gray-400 mb-6">Live feeds of known malicious actors and indicators of compromise (IoCs) targeting LLM infrastructure.</p>
-
-            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto pr-1 scrollbar-hide">
                 {loading ? (
-                    <div className="text-center text-gray-500 py-10">Syncing feeds...</div>
+                    <div className="text-center text-[var(--text-muted)] py-12 font-mono">Syncing intelligence feeds...</div>
                 ) : threats.length === 0 ? (
-                    <div className="text-center text-gray-500 py-10">No active threats reported.</div>
+                    <div className="text-center text-[var(--text-muted)] py-12 font-mono">No active threats reported.</div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6">
                         {threats.map((threat) => (
                             <ThreatCard key={threat.id} threat={threat} />
                         ))}

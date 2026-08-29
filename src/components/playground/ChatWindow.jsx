@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import MessageBubble from './MessageBubble';
 import { Send, Shield, ShieldAlert, Loader2 } from 'lucide-react';
-import { API_BASE_URL } from '../../api';
+import { API_BASE_URL } from '../../services/api';
 
 const SIMULATION_RESPONSES = [
     { response: "I understand you're testing the system. This prompt was analyzed by the 3-stage defense pipeline and classified as safe. How can I help you?", breach_detected: false, threat_type: 'none', latency_ms: 142 },

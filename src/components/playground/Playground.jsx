@@ -17,7 +17,7 @@ const AppPlayground = () => {
 
                 {/* Model Selection */}
                 <div className="bg-gray-800 p-4 rounded-xl border border-gray-700 shadow-lg">
-                    <h2 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-4">
+                    <h2 className="text-xl font-black tracking-tight text-[var(--text-primary)] mb-4">
                         Playground Settings
                     </h2>
                     <ModelSelector

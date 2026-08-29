@@ -19,7 +19,7 @@ const getApiBaseUrl = () => {
   return `http://${hostname}:${port}`;
 };
 
-const API_BASE_URL = import.meta.env.VITE_API_URL === 'auto'
+export const API_BASE_URL = import.meta.env.VITE_API_URL === 'auto'
   ? getApiBaseUrl()
   : (import.meta.env.VITE_API_URL || getApiBaseUrl());
 

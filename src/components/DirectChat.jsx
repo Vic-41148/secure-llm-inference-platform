@@ -155,7 +155,7 @@ const DirectChat = ({ backendConnected }) => {
       <div className="px-8 py-6 border-b border-[var(--border-primary)] bg-[var(--panel-bg)]">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+            <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">
               DIRECT NEURAL INTERFACE
             </h2>
             <p className="text-xs text-[var(--text-muted)] font-mono mt-1">Raw LLM access • Unfiltered communication channel</p>

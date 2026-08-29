@@ -52,27 +52,28 @@ const AttackSidebar = ({ attacks, onSelect, selectedId }) => {
               whileHover={{ scale: 1.02, x: 4 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => onSelect(attack)}
-              className={`w-full text-left p-4 rounded-xl transition-all duration-300 group ${selectedId === attack.id
-                  ? 'bg-cyan-500/10 border-2 border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)]'
-                  : 'bg-[var(--card-bg)] border-2 border-transparent hover:bg-[var(--card-bg-hover)] hover:border-[var(--border-hover)]'
-                }`}
+              className={`w-full text-left p-4 rounded-2xl transition-all duration-300 group border-2 ${
+                selectedId === attack.id
+                  ? 'bg-blue-600/10 dark:bg-cyan-500/15 border-blue-600/40 dark:border-cyan-500/40 shadow-lg shadow-blue-500/10'
+                  : 'bg-[var(--card-bg)] border-[var(--border-primary)] hover:bg-[var(--card-bg-hover)] hover:border-cyan-500/30'
+              }`}
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">
-                  <h3 className={`font-bold text-sm mb-1 ${selectedId === attack.id ? 'text-[var(--text-primary)] relative drop-shadow-md' : 'text-[var(--text-secondary)]'}`}>
+                  <h3 className="font-bold text-sm mb-1 text-[var(--text-primary)]">
                     {attack.name}
                   </h3>
-                  <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider bg-${getAttackColor(attack.type)}-500/20 text-${getAttackColor(attack.type)}-500 border border-${getAttackColor(attack.type)}-500/30`}>
+                  <span className={`inline-block px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold tracking-wider bg-${getAttackColor(attack.type)}-500/15 text-${getAttackColor(attack.type)}-500 border border-${getAttackColor(attack.type)}-500/30`}>
                     {attack.type.toUpperCase()}
                   </span>
                 </div>
               </div>
 
-              <p className="text-xs text-[var(--text-muted)] leading-relaxed mb-3">{attack.description}</p>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-3 font-normal">{attack.description}</p>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-16 h-1.5 bg-[var(--card-bg)] rounded-full overflow-hidden">
+                  <div className="w-16 h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${attack.successRate}%` }}
@@ -92,7 +93,7 @@ const AttackSidebar = ({ attacks, onSelect, selectedId }) => {
                   <motion.svg
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="w-4 h-4 text-cyan-400"
+                    className="w-4 h-4 text-blue-600 dark:text-cyan-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
