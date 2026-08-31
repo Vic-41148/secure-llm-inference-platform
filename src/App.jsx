@@ -21,6 +21,10 @@ import PiiSettings from './components/security/PiiSettings';
 import ProjectList from './components/projects/ProjectList';
 import SettingsLayout from './components/settings/SettingsLayout';
 import Quotas from './components/quotas/Quotas';
+import Sidebar from './components/Sidebar';
+import CommandPalette from './components/CommandPalette';
+import ToastContainer from './components/ToastContainer';
+import SecurityTicker from './components/SecurityTicker';
 import { attackScenarios } from './data/attackScenarios';
 import { sendPrompt, getSystemStats } from './services/api';
 
@@ -28,7 +32,7 @@ import { sendPrompt, getSystemStats } from './services/api';
 //adi was here
 
 function AppInner() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({ name: 'User', email: 'user@local' });
   const [isDefending, setIsDefending] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isBreached, setIsBreached] = useState(false);
@@ -36,6 +40,7 @@ function AppInner() {
   const [selectedAttack, setSelectedAttack] = useState(attackScenarios[0]);
   const [attacks, setAttacks] = useState(attackScenarios);
   const [backendConnected, setBackendConnected] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [logs, setLogs] = useState([
     { time: new Date().toLocaleTimeString(), type: 'SYSTEM', message: 'Sovereign Matrix OS initialized.' },
     { time: new Date().toLocaleTimeString(), type: 'INERA', message: 'Neural bus established.' },
@@ -135,14 +140,11 @@ function AppInner() {
   };
 
   return (
-    // ROOT DIV: no transform, no animate class — keeps fixed children stable
-    <div className="min-h-screen text-[var(--text-primary)] font-sans selection:bg-cyan-500/30 transition-colors duration-300">
+    <div className={`min-h-screen text-[var(--text-primary)] font-sans selection:bg-cyan-500/30 transition-colors duration-300 ${isBreached ? 'animate-shake' : ''}`}>
 
-      {/* BREACH EFFECT: separate fixed overlay — does NOT wrap any children
-          so its transform never breaks Header/DefenseToggle/Console positioning */}
       {isBreached && (
         <div
-          className="animate-shake pointer-events-none"
+          className="pointer-events-none"
           style={{
             position: 'fixed',
             inset: 0,
@@ -153,193 +155,106 @@ function AppInner() {
         />
       )}
 
-      {/* Fixed header */}
       <Header
+        activeView={activeView}
         backendConnected={backendConnected}
         user={user}
         onLoginSuccess={(u) => setUser(u)}
         onLogout={() => setUser(null)}
         isDefending={isDefending}
         onToggleDefense={() => setIsDefending(!isDefending)}
+        onOpenCommandPalette={() => setCommandPaletteOpen(true)}
       />
 
-      {/* Main layout — fixed exactly below the 5rem (80px) header */}
-      <div className="fixed top-20 bottom-0 left-0 right-0 flex overflow-hidden">
-        {activeView === 'lab' && (
-          <AttackSidebar
-            attacks={attacks}
-            selectedId={selectedAttack.id}
-            onSelect={(attack) => { setSelectedAttack(attack); setActiveView('lab'); }}
-          />
-        )}
+      <div className="fixed top-20 bottom-7 left-0 right-0 flex overflow-hidden">
 
-        <main className="flex-1 flex flex-col min-w-0">
-          {/* Tab bar */}
-          <div className="flex flex-wrap items-center gap-2 px-8 py-4 border-b border-[var(--border-primary)] bg-[var(--card-bg)] flex-shrink-0 relative z-30 shadow-md">
-            {['dashboard', 'analytics', 'audit', 'threats', 'dlp', 'map', 'rules', 'fuzzer', 'rag', 'projects', 'quotas', 'playground', 'lab', 'chat', 'settings'].map((view) => {
-              const labels = {
-                dashboard: 'Overview',
-                analytics: 'Analytics',
-                audit: 'Audit Logs',
-                threats: 'Threat Intel',
-                dlp: 'DLP Setup',
-                projects: 'Workspaces',
-                quotas: 'Billing',
-                settings: 'Settings',
-                map: 'Threat Map',
-                rules: 'Rule Engine',
-                fuzzer: 'Auto Fuzzer',
-                rag: 'RAG Scanner',
-                playground: 'AI Playground',
-                lab: 'Attack Lab',
-                chat: 'Neural Link',
-              };
-              const icons = {
-                dashboard: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />,
-                analytics: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />,
-                audit: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />,
-                threats: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />,
-                dlp: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />,
-                projects: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />,
-                quotas: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />,
-                settings: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />,
-                lab: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />,
-                playground: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />,
-                chat: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />,
-              };
-              return (
-                <button
-                  key={view}
-                  onClick={() => {
-                    if (view !== 'dashboard' && !user) {
-                      addLog('WARN', 'AUTHENTICATION REQUIRED: Please login to access ' + labels[view]);
-                      return;
-                    }
-                    setActiveView(view);
-                  }}
-                  className={`px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-all ${activeView === view
-                    ? 'bg-[var(--card-bg-hover)] text-[var(--text-primary)]'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                    } ${view !== 'dashboard' && !user ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    {icons[view]}
-                  </svg>
-                  {labels[view]}
-                </button>
-              );
-            })}
-          </div>
+        <Sidebar activeView={activeView} onNavigate={setActiveView} />
 
-          {/* Active view */}
-          <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
+        <div className="flex-1 flex overflow-hidden min-w-0">
+          {activeView === 'lab' && (
+            <AttackSidebar
+              attacks={attacks}
+              selectedId={selectedAttack.id}
+              onSelect={(attack) => { setSelectedAttack(attack); setActiveView('lab'); }}
+            />
+          )}
+
+          <main className="flex-1 overflow-y-auto scrollbar-hide pb-12">
             <AnimatePresence mode="wait">
               {activeView === 'dashboard' ? (
-                <Dashboard key="dashboard" isDefending={isDefending} isProcessing={isProcessing} isBreached={isBreached} stats={stats} />
+                <motion.div key="dashboard" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <Dashboard isDefending={isDefending} isProcessing={isProcessing} isBreached={isBreached} stats={stats} onNavigate={setActiveView} />
+                </motion.div>
               ) : activeView === 'analytics' ? (
-                <AnalyticsDashboard key="analytics" />
+                <motion.div key="analytics" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <AnalyticsDashboard />
+                </motion.div>
               ) : activeView === 'audit' ? (
-                <AuditLogs key="audit" />
+                <motion.div key="audit" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <AuditLogs />
+                </motion.div>
               ) : activeView === 'threats' ? (
-                <ThreatIntelBoard key="threats" />
+                <motion.div key="threats" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <ThreatIntelBoard />
+                </motion.div>
               ) : activeView === 'dlp' ? (
-                <PiiSettings key="dlp" />
+                <motion.div key="dlp" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <PiiSettings />
+                </motion.div>
               ) : activeView === 'projects' ? (
-                <ProjectList key="projects" />
+                <motion.div key="projects" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <ProjectList />
+                </motion.div>
               ) : activeView === 'quotas' ? (
-                <Quotas key="quotas" />
+                <motion.div key="quotas" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <Quotas />
+                </motion.div>
               ) : activeView === 'settings' ? (
-                <SettingsLayout key="settings" />
+                <motion.div key="settings" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <SettingsLayout />
+                </motion.div>
               ) : activeView === 'map' ? (
-                <ThreatMap key="map" />
+                <motion.div key="map" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <ThreatMap />
+                </motion.div>
               ) : activeView === 'rules' ? (
-                <RuleBuilder key="rules" />
+                <motion.div key="rules" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <RuleBuilder />
+                </motion.div>
               ) : activeView === 'fuzzer' ? (
-                <RedTeamFuzzer key="fuzzer" />
+                <motion.div key="fuzzer" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <RedTeamFuzzer />
+                </motion.div>
               ) : activeView === 'rag' ? (
-                <RagScanner key="rag" />
+                <motion.div key="rag" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <RagScanner />
+                </motion.div>
               ) : activeView === 'playground' ? (
-                <AppPlayground key="playground" />
+                <motion.div key="playground" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <AppPlayground />
+                </motion.div>
               ) : activeView === 'chat' ? (
-                user ? (
-                  <DirectChat key="chat" backendConnected={backendConnected} />
-                ) : null
+                <motion.div key="chat" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <DirectChat backendConnected={backendConnected} />
+                </motion.div>
               ) : (
-                user ? (
-                  <AttackLab key="lab" attack={selectedAttack} isSimulating={isProcessing} onSimulate={handleSimulate} />
-                ) : null
+                <motion.div key="lab" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <AttackLab attack={selectedAttack} isSimulating={isProcessing} onSimulate={handleSimulate} />
+                </motion.div>
               )}
             </AnimatePresence>
+          </main>
+        </div>
+      </div>
 
-            {/* Access Denied Overlay */}
-            {!user && activeView !== 'dashboard' && (
-              <motion.div
-                initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
-                animate={{ opacity: 1, backdropFilter: 'blur(10px)' }}
-                exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
-                transition={{ duration: 0.2 }}
-                className="absolute inset-0 flex flex-col items-center justify-center z-40"
-                style={{ background: 'linear-gradient(180deg, rgba(10,15,26,0.97) 0%, rgba(10,15,26,0.99) 100%)' }}
-              >
-                <motion.div
-                  initial={{ scale: 0.8, y: 30, opacity: 0 }}
-                  animate={{ scale: 1, y: 0, opacity: 1 }}
-                  transition={{ type: 'spring', damping: 20, stiffness: 300, delay: 0.1 }}
-                  className="flex flex-col items-center"
-                >
-                  {/* Warning Icon */}
-                  <div className="relative mb-6">
-                    <div className="w-20 h-20 rounded-full flex items-center justify-center"
-                      style={{ background: 'rgba(239,68,68,0.08)', border: '2px solid rgba(239,68,68,0.3)', boxShadow: '0 0 40px rgba(239,68,68,0.15)' }}>
-                      <svg className="w-10 h-10" fill="none" stroke="rgba(239,68,68,0.8)" viewBox="0 0 24 24" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                      </svg>
-                    </div>
-                    <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 animate-pulse" style={{ boxShadow: '0 0 12px rgba(239,68,68,0.6)' }} />
-                  </div>
-
-                  {/* Title */}
-                  <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold font-mono tracking-widest mb-2" style={{ color: 'rgba(239,68,68,0.9)', textShadow: '0 0 20px rgba(239,68,68,0.3)' }}>
-                      ACCESS DENIED
-                    </h2>
-                    <p className="text-xs font-mono tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                      CLEARANCE LEVEL INSUFFICIENT — AUTHENTICATION REQUIRED
-                    </p>
-                  </div>
-
-                  {/* Info Box */}
-                  <div className="mb-8 px-6 py-4 rounded-lg max-w-sm text-center"
-                    style={{ background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.15)' }}>
-                    <p className="text-xs font-mono leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                      <span style={{ color: 'rgba(239,68,68,0.7)' }}>▶</span> Module: <span className="font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>{activeView === 'lab' ? 'ATTACK LAB' : 'DIRECT NEURAL LINK'}</span><br />
-                      <span style={{ color: 'rgba(239,68,68,0.7)' }}>▶</span> Status: <span className="font-bold" style={{ color: 'rgba(239,68,68,0.8)' }}>LOCKED</span><br />
-                      <span style={{ color: 'rgba(239,68,68,0.7)' }}>▶</span> Required: <span className="font-bold" style={{ color: '#00ffb4' }}>GOOGLE SSO</span>
-                    </p>
-                  </div>
-
-                  {/* CTA */}
-                  <motion.button
-                    whileHover={{ scale: 1.05, boxShadow: '0 0 24px rgba(0,255,180,0.25)', backgroundColor: 'rgba(0,255,180,0.15)' }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      const loginBtn = document.querySelector('[style*="LOGIN"]') || document.querySelector('button');
-                      window.dispatchEvent(new CustomEvent('ns-open-login'));
-                    }}
-                    className="group px-8 py-3 rounded-lg font-mono text-sm font-bold tracking-wider transition-colors duration-300"
-                    style={{ background: 'rgba(0,255,180,0.08)', border: '1px solid rgba(0,255,180,0.4)', color: '#00ffb4' }}
-                  >
-                    ⬡ SIGN IN TO CONTINUE
-                  </motion.button>
-                </motion.div>
-              </motion.div>
-            )}
-          </div>
-        </main>
+      <div className="fixed bottom-0 left-0 right-0 z-30">
+        <SecurityTicker />
       </div>
 
       <ConsolePanel logs={logs} />
       <NetworkPanel backendConnected={backendConnected} />
+      <CommandPalette isOpen={commandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} onNavigate={setActiveView} />
+      <ToastContainer />
 
       <style>{`
         @keyframes shake {

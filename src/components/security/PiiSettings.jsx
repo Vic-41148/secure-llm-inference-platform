@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Fingerprint, Save, Check } from 'lucide-react';
+import { Fingerprint, Save, Check, ShieldAlert } from 'lucide-react';
 
 const STORAGE_KEY = 'ns_dlp_settings';
 
@@ -33,51 +33,66 @@ const PiiSettings = () => {
         setTimeout(() => setSaved(false), 2000);
     };
 
-    const Switch = ({ checked, onChange, label }) => (
-        <label className="flex items-center justify-between cursor-pointer p-3 bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors border border-gray-700">
-            <span className="text-sm font-semibold text-gray-300">{label}</span>
-            <div className="relative">
+    const Switch = ({ checked, onChange, label, desc }) => (
+        <label className="flex items-center justify-between cursor-pointer p-4 rounded-xl glass-card border border-[var(--border-primary)] hover:border-cyan-500/40 transition-all duration-200">
+            <div>
+                <span className="text-sm font-bold text-[var(--text-primary)] block">{label}</span>
+                <span className="text-xs text-[var(--text-muted)] font-mono">{desc}</span>
+            </div>
+            <div className="relative flex-shrink-0 ml-4">
                 <input type="checkbox" className="sr-only peer" checked={checked} onChange={onChange} />
-                <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                <div className="w-12 h-6 bg-slate-700/60 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all after:shadow-md peer-checked:bg-cyan-500"></div>
             </div>
         </label>
     );
 
     return (
-        <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-md h-full flex flex-col">
-            <div className="flex items-center gap-2 mb-6 text-xl">
-                <Fingerprint className="text-purple-500 w-6 h-6" />
-                <h2 className="font-bold text-gray-200">Data Loss Prevention (DLP)</h2>
-            </div>
-
-            <p className="text-sm text-gray-400 mb-6">Configure which sensitive data elements should be intercepted before reaching the LLM, or blocked entirely.</p>
-
-            <div className="flex-1 space-y-3">
-                <Switch label="Mask Email Addresses" checked={settings.mask_emails} onChange={() => toggleSetting('mask_emails')} />
-                <Switch label="Mask Phone Numbers" checked={settings.mask_phones} onChange={() => toggleSetting('mask_phones')} />
-                <Switch label="Mask SSN / National IDs" checked={settings.mask_ssn} onChange={() => toggleSetting('mask_ssn')} />
-                <Switch label="Mask Credit Cards" checked={settings.mask_credit_cards} onChange={() => toggleSetting('mask_credit_cards')} />
-
-                <div className="mt-6 pt-6 border-t border-gray-700">
-                    <label className="block text-sm font-semibold text-gray-300 mb-3">Interception Action</label>
-                    <select
-                        className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500"
-                        value={settings.action}
-                        onChange={(e) => { setSettings(prev => ({ ...prev, action: e.target.value })); setSaved(false); }}
-                    >
-                        <option value="redact">Redact and Synthesize (Replace with tokens)</option>
-                        <option value="block">Hard Block (Reject request entirely)</option>
-                    </select>
+        <div className="p-8 space-y-6 h-full flex flex-col overflow-hidden max-w-4xl mx-auto">
+            <div className="glass-card p-6 rounded-2xl border border-[var(--border-accent)] flex items-center justify-between shadow-xl flex-shrink-0">
+                <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-blue-500/15 border border-blue-500/30 text-blue-500 flex items-center justify-center shadow-md">
+                        <Fingerprint className="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-bold text-[var(--text-primary)]">Data Loss Prevention (DLP)</h2>
+                        <p className="text-xs text-[var(--text-muted)] font-mono mt-0.5">Intercept and sanitize sensitive data before prompt synthesis</p>
+                    </div>
                 </div>
             </div>
 
-            <div className="mt-6 flex justify-end">
-                <button
-                    onClick={handleSave}
-                    className={`flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-colors ${saved ? 'bg-purple-700 text-purple-200' : 'bg-purple-600 hover:bg-purple-500 text-white'}`}
-                >
-                    {saved ? <><Check className="w-4 h-4" /> Saved</> : <><Save className="w-4 h-4" /> Save Policies</>}
-                </button>
+            <div className="glass-card p-6 rounded-2xl border border-[var(--border-primary)] shadow-xl flex-1 flex flex-col justify-between overflow-y-auto">
+                <div className="space-y-3">
+                    <Switch label="Mask Email Addresses" desc="Detects RFC-compliant email strings" checked={settings.mask_emails} onChange={() => toggleSetting('mask_emails')} />
+                    <Switch label="Mask Phone Numbers" desc="Detects international & local phone formats" checked={settings.mask_phones} onChange={() => toggleSetting('mask_phones')} />
+                    <Switch label="Mask SSN / National IDs" desc="Interprets 9-digit SSN & passport patterns" checked={settings.mask_ssn} onChange={() => toggleSetting('mask_ssn')} />
+                    <Switch label="Mask Credit Cards" desc="Luhn-algorithm validated 16-digit PAN numbers" checked={settings.mask_credit_cards} onChange={() => toggleSetting('mask_credit_cards')} />
+
+                    <div className="mt-6 pt-6 border-t border-[var(--border-primary)]">
+                        <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">Interception Action</label>
+                        <select
+                            className="w-full bg-[var(--panel-bg)] border border-[var(--border-primary)] rounded-xl p-3 text-[var(--text-primary)] text-sm focus:outline-none focus:border-cyan-500 transition-colors cursor-pointer"
+                            value={settings.action}
+                            onChange={(e) => { setSettings(prev => ({ ...prev, action: e.target.value })); setSaved(false); }}
+                        >
+                            <option value="redact">Redact and Synthesize (Replace with tokens: [REDACTED_SSN])</option>
+                            <option value="block">Hard Block (Reject prompt and terminate request)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div className="mt-8 pt-4 border-t border-[var(--border-primary)] flex items-center justify-between">
+                    <span className="text-xs text-[var(--text-muted)] font-mono">Changes persist automatically to defense matrix</span>
+                    <button
+                        onClick={handleSave}
+                        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold font-mono text-xs uppercase tracking-wider transition-all duration-200 shadow-lg ${
+                            saved
+                                ? 'bg-emerald-600 text-white shadow-emerald-500/25 scale-105'
+                                : 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 !text-white shadow-blue-500/25 active:scale-95'
+                        }`}
+                    >
+                        {saved ? <><Check className="w-4 h-4 text-white" /> Saved Successfully</> : <><Save className="w-4 h-4 text-white" /> Save Policies</>}
+                    </button>
+                </div>
             </div>
         </div>
     );

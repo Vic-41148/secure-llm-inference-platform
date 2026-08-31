@@ -45,10 +45,10 @@ const AnalyticsDashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <MetricCard title="Total Requests" value={summary.total_requests.toLocaleString()} icon="activity" color="text-blue-400" />
-                <MetricCard title="Total Tokens" value={summary.total_tokens.toLocaleString()} icon="cpu" color="text-purple-400" />
-                <MetricCard title="Avg Latency" value={`${summary.avg_latency.toFixed(1)}ms`} icon="clock" color="text-green-400" />
-                <MetricCard title="Security Incidents" value={summary.security_incidents} icon="shield" color="text-red-400" />
+                <MetricCard title="Total Requests" value={summary.total_requests.toLocaleString()} icon="activity" color="text-blue-500" />
+                <MetricCard title="Total Tokens" value={summary.total_tokens.toLocaleString()} icon="cpu" color="text-cyan-500" />
+                <MetricCard title="Avg Latency" value={`${summary.avg_latency.toFixed(1)}ms`} icon="clock" color="text-emerald-500" />
+                <MetricCard title="Security Incidents" value={summary.security_incidents} icon="shield" color="text-red-500" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
