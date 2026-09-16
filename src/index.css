@@ -597,3 +597,162 @@ body::after {
 [class*="animate-"] {
   transition: none !important;
 }
+
+/* ============================================================
+   SKELETON SHIMMER ANIMATION
+   ============================================================ */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+/* ============================================================
+   SPARKLINE LIVE END-DOT PING
+   ============================================================ */
+@keyframes sparkPing {
+  0%   { r: 3; opacity: 0.8; }
+  70%  { r: 7; opacity: 0; }
+  100% { r: 7; opacity: 0; }
+}
+
+/* ============================================================
+   BADGE PULSE DOT
+   ============================================================ */
+.badge-pulse-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  margin-right: 4px;
+  flex-shrink: 0;
+  animation: badgePulse 2s ease-in-out infinite;
+}
+@keyframes badgePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* ============================================================
+   SIDEBAR ACTIVE INDICATOR — stronger glow on hover
+   ============================================================ */
+.sidebar-nav-btn:hover .sidebar-active-bar {
+  box-shadow: 0 0 12px rgba(6,182,212,1);
+}
+
+/* ============================================================
+   FOCUS RING — keyboard accessibility
+   ============================================================ */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid rgba(6,182,212,0.7);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   PAGE ENTER ANIMATION
+   ============================================================ */
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-enter {
+  animation: pageEnter 0.2s ease-out both;
+}
+
+/* ============================================================
+   GRADIENT BORDER UTILITY
+   ============================================================ */
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(6,182,212,0.5), rgba(59,130,246,0.3), rgba(6,182,212,0.5));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ============================================================
+   ENHANCED HOVER GLOW STATES
+   ============================================================ */
+.hover-glow-cyan:hover {
+  box-shadow: 0 0 0 1px rgba(6,182,212,0.4), 0 8px 32px -4px rgba(6,182,212,0.2);
+}
+.hover-glow-emerald:hover {
+  box-shadow: 0 0 0 1px rgba(16,185,129,0.4), 0 8px 32px -4px rgba(16,185,129,0.2);
+}
+.hover-glow-red:hover {
+  box-shadow: 0 0 0 1px rgba(239,68,68,0.4), 0 8px 32px -4px rgba(239,68,68,0.2);
+}
+
+/* ============================================================
+   CARD LIFT EFFECT
+   ============================================================ */
+.card-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px -8px rgba(0,0,0,0.3);
+}
+html.light .card-lift:hover {
+  box-shadow: 0 16px 40px -8px rgba(0,0,0,0.1);
+}
+
+/* ============================================================
+   TERMINAL / CODE BACKGROUNDS (theme-aware)
+   ============================================================ */
+.code-bg {
+  background: rgba(0, 0, 0, 0.45);
+}
+html.light .code-bg {
+  background: rgba(15, 23, 42, 0.05);
+}
+
+/* ============================================================
+   LIGHT MODE: PROGRESS BAR TRACK FIX
+   ============================================================ */
+html.light [class*="bg-slate-900"] {
+  background-color: #f1f5f9 !important;
+}
+
+/* ============================================================
+   NOTIFICATION / TOAST SLIDE IN
+   ============================================================ */
+@keyframes slideInRight {
+  from { transform: translateX(110%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+.toast-enter {
+  animation: slideInRight 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+/* ============================================================
+   HEADER POLISH — subtle bottom separator glow
+   ============================================================ */
+html.dark header {
+  box-shadow: 0 1px 0 rgba(6,182,212,0.12), 0 4px 24px rgba(0,0,0,0.4);
+}
+
+/* ============================================================
+   SIDEBAR BOTTOM FADE
+   ============================================================ */
+aside::after {
+  content: '';
+  position: absolute;
+  bottom: 36px;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background: linear-gradient(to bottom, transparent, var(--sidebar-bg));
+  pointer-events: none;
+}

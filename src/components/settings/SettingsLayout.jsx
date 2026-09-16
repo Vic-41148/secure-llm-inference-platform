@@ -8,7 +8,7 @@ const SettingsLayout = () => {
     const [activeTab, setActiveTab] = useState('apikeys');
 
     return (
-        <div className="flex h-full bg-gray-900 text-white p-6 gap-6 overflow-hidden w-full">
+        <div className="flex h-full bg-[var(--bg-body)] text-[var(--text-primary)] p-6 gap-6 overflow-hidden w-full">
             {/* Sidebar Navigation */}
             <div className="w-1/4 flex flex-col gap-2">
                 <div className="mb-6 px-3">

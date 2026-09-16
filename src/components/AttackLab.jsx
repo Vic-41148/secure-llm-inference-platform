@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const CopyButton = ({ text, size = 'sm' }) => {
@@ -105,6 +105,10 @@ const MessageBody = ({ content }) => {
 
 const AttackLab = ({ attack, isSimulating, onSimulate }) => {
   const [prompt, setPrompt] = useState(attack.lastPrompt || '');
+
+  useEffect(() => {
+    setPrompt(attack.lastPrompt || '');
+  }, [attack.id, attack.lastPrompt]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

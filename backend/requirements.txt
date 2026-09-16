@@ -4,3 +4,5 @@ pydantic>=2.11
 python-multipart==0.0.20
 google-auth>=2.27.0
 requests>=2.31.0
+psutil>=6.0.0
+python-dotenv>=1.0.0

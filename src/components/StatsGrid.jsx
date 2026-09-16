@@ -32,56 +32,111 @@ const AnimatedNumber = ({ value, duration = 1.2 }) => {
   return <>{typeof value === 'string' && isNaN(parseInt(value, 10)) ? value : displayValue}</>;
 };
 
-// Micro Sparkline Chart SVG Component
+// Skeleton shimmer card
+const SkeletonCard = () => (
+  <div className="relative glass-card rounded-2xl p-6 border border-[var(--border-primary)] overflow-hidden flex flex-col justify-between" style={{ minHeight: 160 }}>
+    <div className="absolute inset-0 overflow-hidden">
+      <div
+        className="absolute inset-0 -translate-x-full"
+        style={{
+          background: 'linear-gradient(90deg, transparent 0%, rgba(6,182,212,0.08) 50%, transparent 100%)',
+          animation: 'shimmer 1.6s infinite',
+        }}
+      />
+    </div>
+    <div className="relative z-10 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5" />
+        <div className="w-20 h-7 rounded-md bg-white/5 border border-white/5" />
+      </div>
+      <div className="w-20 h-8 rounded-lg bg-white/5 border border-white/5" />
+      <div className="w-32 h-3 rounded-md bg-white/5 border border-white/5" />
+    </div>
+    <div className="relative z-10 pt-2 border-t border-white/5 flex items-center justify-between mt-3">
+      <div className="w-16 h-4 rounded-md bg-white/5 border border-white/5" />
+      <div className="w-20 h-3 rounded-md bg-white/5 border border-white/5" />
+    </div>
+  </div>
+);
+
+// Micro Sparkline Chart SVG Component — with gradient fill + live end dot
 const Sparkline = ({ color = 'cyan', data = [12, 18, 14, 25, 20, 32, 28, 40] }) => {
   const max = Math.max(...data);
   const min = Math.min(...data);
   const range = max - min || 1;
   const height = 32;
   const width = 120;
+  const uid = color; // use color as a stable gradient id
 
-  const points = data
-    .map((val, idx) => {
-      const x = (idx / (data.length - 1)) * width;
-      const y = height - ((val - min) / range) * (height - 6) - 3;
-      return `${x},${y}`;
-    })
-    .join(' ');
+  const pts = data.map((val, idx) => ({
+    x: (idx / (data.length - 1)) * width,
+    y: height - ((val - min) / range) * (height - 6) - 3,
+  }));
+
+  const linePoints = pts.map(p => `${p.x},${p.y}`).join(' ');
+
+  // Build closed polygon for fill: line points + bottom-right + bottom-left
+  const fillPoints = [
+    ...pts.map(p => `${p.x},${p.y}`),
+    `${width},${height}`,
+    `0,${height}`,
+  ].join(' ');
 
   const strokeColors = {
     blue: '#60a5fa',
     emerald: '#34d399',
     purple: '#c084fc',
     cyan: '#22d3ee',
+    indigo: '#818cf8',
   };
 
   const strokeColor = strokeColors[color] || '#22d3ee';
+  const lastPt = pts[pts.length - 1];
 
   return (
-    <svg className="w-full h-8 overflow-visible opacity-70 group-hover:opacity-100 transition-opacity" viewBox={`0 0 ${width} ${height}`}>
+    <svg className="w-full h-8 overflow-visible transition-opacity" viewBox={`0 0 ${width} ${height}`}>
+      <defs>
+        <linearGradient id={`spark-grad-${uid}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={strokeColor} stopOpacity="0.25" />
+          <stop offset="100%" stopColor={strokeColor} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+
+      {/* Gradient fill area */}
+      <polygon
+        points={fillPoints}
+        fill={`url(#spark-grad-${uid})`}
+      />
+
+      {/* Line */}
       <polyline
         fill="none"
         stroke={strokeColor}
-        strokeWidth="2"
+        strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
-        points={points}
+        points={linePoints}
       />
-      {/* End dot */}
-      {data.length > 0 && (
-        <circle
-          cx={width}
-          cy={height - ((data[data.length - 1] - min) / range) * (height - 6) - 3}
-          r="3"
-          fill={strokeColor}
-          className="animate-ping"
-        />
-      )}
+
+      {/* Static end dot */}
+      <circle cx={lastPt.x} cy={lastPt.y} r="2.5" fill={strokeColor} />
+
+      {/* Animated ping ring */}
+      <circle
+        cx={lastPt.x}
+        cy={lastPt.y}
+        r="4"
+        fill="none"
+        stroke={strokeColor}
+        strokeWidth="1.5"
+        opacity="0.6"
+        style={{ animation: 'sparkPing 1.5s ease-out infinite' }}
+      />
     </svg>
   );
 };
 
-const StatsGrid = ({ stats = {} }) => {
+const StatsGrid = ({ stats = {}, loading = false }) => {
   const statCards = [
     {
       label: 'Total Attack Attempts',
@@ -159,19 +214,33 @@ const StatsGrid = ({ stats = {} }) => {
     },
   };
 
+  if (loading) {
+    return (
+      <div className="px-8 pb-8">
+        <div className="flex items-center gap-2 mb-6">
+          <span className="w-2.5 h-2.5 rounded-full bg-cyan-400/40 animate-pulse" />
+          <div className="w-48 h-7 rounded-lg bg-white/5 border border-white/5" style={{ animation: 'shimmer 1.6s infinite' }} />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[0,1,2,3].map(i => <SkeletonCard key={i} />)}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="px-8 pb-8">
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
-            <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Telemetry Analytics</h3>
+            <h3 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] tracking-tight">Telemetry Analytics</h3>
           </div>
-          <p className="text-xs text-slate-400 font-mono tracking-wider mt-1">Real-time attack classification and telemetry metrics</p>
+          <p className="text-xs text-[var(--text-muted)] font-mono tracking-wider mt-1">Real-time attack classification and telemetry metrics</p>
         </div>
 
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-slate-300">
-          <span className="text-slate-500">POLLING:</span>
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--card-bg)] border border-[var(--border-primary)] text-xs font-mono text-[var(--text-secondary)]">
+          <span className="text-[var(--text-muted)]">POLLING:</span>
           <span className="text-emerald-400 font-bold">1000ms AUTO</span>
         </div>
       </div>
@@ -213,17 +282,17 @@ const StatsGrid = ({ stats = {} }) => {
                   <AnimatedNumber value={stat.value} />
                 </div>
 
-                <div className="text-xs text-slate-300 font-mono uppercase tracking-wider font-semibold mb-3">
+                <div className="text-xs text-[var(--text-secondary)] font-mono uppercase tracking-wider font-semibold mb-3">
                   {stat.label}
                 </div>
               </div>
 
               {/* Bottom pill comparison */}
-              <div className="relative z-10 pt-2 border-t border-white/5 flex items-center justify-between">
+              <div className="relative z-10 pt-2 border-t border-[var(--border-primary)] flex items-center justify-between">
                 <div className={`px-2.5 py-0.5 rounded-md ${c.bg} border ${c.border}`}>
                   <span className={`text-[11px] font-mono font-bold ${c.text}`}>{stat.change}</span>
                 </div>
-                <span className="text-[11px] text-slate-500 font-mono">live telemetry</span>
+                <span className="text-[11px] text-[var(--text-muted)] font-mono">live telemetry</span>
               </div>
 
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[var(--border-hover)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -237,7 +306,7 @@ const StatsGrid = ({ stats = {} }) => {
         {/* Threat Distribution */}
         <div className="glass-card rounded-2xl p-6 border border-[var(--border-primary)] shadow-lg hover:border-cyan-500/30 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="text-lg font-bold text-white flex items-center gap-2">
+            <h4 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
               Threat Classification Vector
             </h4>
@@ -255,10 +324,10 @@ const StatsGrid = ({ stats = {} }) => {
             ].map((threat, idx) => (
               <div key={idx}>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs sm:text-sm font-medium text-slate-200">{threat.name}</span>
+                  <span className="text-xs sm:text-sm font-medium text-[var(--text-secondary)]">{threat.name}</span>
                   <span className={`text-xs sm:text-sm font-mono font-bold ${threat.color}`}>{threat.value}%</span>
                 </div>
-                <div className="h-2 bg-slate-900 rounded-full overflow-hidden border border-white/5">
+                <div className="h-2 bg-[var(--card-bg)] rounded-full overflow-hidden border border-[var(--border-primary)]">
                   <motion.div
                     className={`h-full bg-gradient-to-r ${threat.bar}`}
                     initial={{ width: 0 }}
@@ -274,7 +343,7 @@ const StatsGrid = ({ stats = {} }) => {
         {/* System Health Matrix */}
         <div className="glass-card rounded-2xl p-6 border border-[var(--border-primary)] shadow-lg hover:border-emerald-500/30 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="text-lg font-bold text-white flex items-center gap-2">
+            <h4 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
               Neural Defense Matrix Integrity
             </h4>
@@ -293,10 +362,10 @@ const StatsGrid = ({ stats = {} }) => {
               <div key={idx} className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs sm:text-sm font-medium text-slate-200">{system.label}</span>
+                    <span className="text-xs sm:text-sm font-medium text-[var(--text-secondary)]">{system.label}</span>
                     <span className="text-xs text-emerald-400 font-mono font-bold">{system.status}</span>
                   </div>
-                  <div className="h-2 bg-slate-900 rounded-full overflow-hidden border border-white/5">
+                  <div className="h-2 bg-[var(--card-bg)] rounded-full overflow-hidden border border-[var(--border-primary)]">
                     <motion.div
                       className="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400"
                       initial={{ width: 0 }}

@@ -3,21 +3,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Shield, Zap, Terminal, Globe, Sliders, Activity, Cpu, Key, FileText, ArrowRight, CornerDownLeft } from 'lucide-react';
 
 const ACTIONS = [
-  { id: 'overview', title: 'Dashboard Overview', category: 'Navigation', icon: Activity, keywords: 'home matrix telemetry' },
-  { id: 'analytics', title: 'Telemetry & Analytics', category: 'Navigation', icon: Activity, keywords: 'metrics tokens charts latency' },
-  { id: 'audit', title: 'Audit Trail Logs', category: 'Navigation', icon: FileText, keywords: 'logs security history events' },
-  { id: 'threats', title: 'Threat Intelligence Board', category: 'Navigation', icon: Globe, keywords: 'apt actors ioc feeds' },
-  { id: 'threatmap', title: 'Live Threat Topography', category: 'Navigation', icon: Globe, keywords: 'radar world map coordinates' },
-  { id: 'dlp', title: 'Data Loss Prevention (DLP)', category: 'Security', icon: Shield, keywords: 'pii ssn redact mask email credit card' },
-  { id: 'rules', title: 'Dynamic Rule Engine', category: 'Arsenal', icon: Sliders, keywords: 'custom regex keywords deploy' },
-  { id: 'fuzzer', title: 'Automated Red-Team Fuzzer', category: 'Arsenal', icon: Zap, keywords: 'jailbreak stress test attacks' },
-  { id: 'rag', title: 'RAG Context Scanner', category: 'Arsenal', icon: FileText, keywords: 'embeddings injection poison document' },
-  { id: 'playground', title: 'AI Attack Sandbox', category: 'Arsenal', icon: Terminal, keywords: 'chat simulate prompts llama' },
-  { id: 'lab', title: 'Attack Simulation Lab', category: 'Operations', icon: Zap, keywords: 'vectors dan roleplay' },
-  { id: 'chat', title: 'Direct Neural Link', category: 'Operations', icon: Terminal, keywords: 'raw unfiltered llm interface' },
-  { id: 'workspaces', title: 'Workspace Isolation', category: 'Operations', icon: Sliders, keywords: 'projects api keys quota' },
-  { id: 'billing', title: 'Token Economics & Quotas', category: 'Operations', icon: Cpu, keywords: 'limits rate costs' },
-  { id: 'settings', title: 'System Configuration', category: 'System', icon: Sliders, keywords: 'keys models preferences api' },
+  { id: 'dashboard', title: 'Dashboard Overview', category: 'Operations', icon: Activity, keywords: 'home matrix telemetry status' },
+  { id: 'lab', title: 'Attack Simulation Lab', category: 'Operations', icon: Zap, keywords: 'vectors dan roleplay prompt injection bypass' },
+  { id: 'chat', title: 'Direct Neural Link', category: 'Operations', icon: Terminal, keywords: 'raw unfiltered llm interface chat ollama' },
+  { id: 'rules', title: 'Dynamic Rule Engine', category: 'Arsenal', icon: Sliders, keywords: 'custom regex keywords deploy safety' },
+  { id: 'fuzzer', title: 'Automated Red-Team Fuzzer', category: 'Arsenal', icon: Zap, keywords: 'jailbreak stress test attacks automated' },
+  { id: 'rag', title: 'RAG Poison Scanner', category: 'Arsenal', icon: FileText, keywords: 'embeddings injection poison document vector' },
+  { id: 'map', title: 'Live Threat Topography', category: 'Arsenal', icon: Globe, keywords: 'radar world map coordinates gps' },
+  { id: 'threats', title: 'Threat Intelligence Board', category: 'Intelligence', icon: Globe, keywords: 'apt actors ioc feeds cozy bear lazarus' },
+  { id: 'analytics', title: 'Telemetry & Analytics', category: 'Intelligence', icon: Activity, keywords: 'metrics tokens charts latency volume' },
+  { id: 'audit', title: 'Audit Trail Logs', category: 'Intelligence', icon: FileText, keywords: 'logs security history events administrative' },
+  { id: 'dlp', title: 'DLP & Security Policies', category: 'Governance', icon: Shield, keywords: 'pii ssn redact mask email credit card' },
+  { id: 'projects', title: 'Workspace Isolation', category: 'Governance', icon: Sliders, keywords: 'projects api keys environments credentials' },
 ];
 
 const CommandPalette = ({ isOpen, onClose, onNavigate }) => {

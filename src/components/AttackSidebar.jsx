@@ -2,14 +2,19 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const AttackSidebar = ({ attacks, onSelect, selectedId }) => {
-  const getAttackColor = (type) => {
-    const colors = {
-      Benign: 'emerald',
-      Jailbreak: 'orange',
-      'Direct Injection': 'red',
-      'Social Engineering': 'purple',
-    };
-    return colors[type] || 'blue';
+  const getAttackBadgeStyle = (type) => {
+    switch (type) {
+      case 'Benign':
+        return 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30';
+      case 'Jailbreak':
+        return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
+      case 'Direct Injection':
+        return 'bg-red-500/15 text-red-400 border-red-500/30';
+      case 'Social Engineering':
+        return 'bg-purple-500/15 text-purple-400 border-purple-500/30';
+      default:
+        return 'bg-blue-500/15 text-blue-400 border-blue-500/30';
+    }
   };
 
   const getSuccessColor = (rate) => {
@@ -63,7 +68,7 @@ const AttackSidebar = ({ attacks, onSelect, selectedId }) => {
                   <h3 className="font-bold text-sm mb-1 text-[var(--text-primary)]">
                     {attack.name}
                   </h3>
-                  <span className={`inline-block px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold tracking-wider bg-${getAttackColor(attack.type)}-500/15 text-${getAttackColor(attack.type)}-500 border border-${getAttackColor(attack.type)}-500/30`}>
+                  <span className={`inline-block px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold tracking-wider border ${getAttackBadgeStyle(attack.type)}`}>
                     {attack.type.toUpperCase()}
                   </span>
                 </div>

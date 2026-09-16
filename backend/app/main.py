@@ -47,7 +47,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-from app.config.settings import settings
+from app.config.settings import settings as app_settings
 from app.services.logging_setup import setup_logging
 from app.services.ollama_service import ollama_service
 from app.services.stats_store import get_stats
@@ -89,7 +89,7 @@ app = FastAPI(
 # ── Middleware ─────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=app_settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -165,8 +165,8 @@ async def startup_event():
     logger.info("=" * 60)
     logger.info(f"🤖 Ollama Model : {ollama_service.model}")
     logger.info(f"📝 Log file     : {log_file}")
-    logger.info(f"🌐 CORS origins : {settings.CORS_ORIGINS}")
-    logger.info(f"🔒 Rate limit   : {settings.RATE_LIMIT_PER_MINUTE} req/min")
+    logger.info(f"🌐 CORS origins : {app_settings.CORS_ORIGINS}")
+    logger.info(f"🔒 Rate limit   : {app_settings.RATE_LIMIT_PER_MINUTE} req/min")
     logger.info("=" * 60)
     # Commit 20: warm up the model
     ollama_service.warm_up()
@@ -193,14 +193,23 @@ async def health():
         "timestamp": time.time()
     }
 
-@app.post("/chat")
-async def chat(request: ChatRequest, user_info: dict = Depends(verify_google_token)):
+@app.on_event("shutdown")
+async def shutdown_event():
     """
-    Commit 21: On shutdown dump final statistics to a JSON file in logs/.
+    On shutdown dump final statistics to a JSON file in logs/.
     """
-    if settings.STATS_DUMP_ON_SHUTDOWN:
+    if app_settings.STATS_DUMP_ON_SHUTDOWN:
         final_stats = get_stats()
         final_stats["shutdown_at"] = time.time()
+        log_dir = os.path.join(os.path.dirname(__file__), "..", "logs")
+        os.makedirs(log_dir, exist_ok=True)
+        stats_file = os.path.join(log_dir, "shutdown_stats.json")
+        try:
+            with open(stats_file, "w") as f:
+                json.dump(final_stats, f, indent=2)
+            logger.info(f"📊 Shutdown stats dumped to {stats_file}")
+        except Exception as e:
+            logger.error(f"❌ Failed to dump shutdown stats: {e}")
 
 @app.post("/api/prompt")
 async def analyze_prompt(request: PromptRequest, user_info: dict = Depends(verify_google_token)):
@@ -362,7 +371,7 @@ if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
         "app.main:app",
-        host=settings.API_HOST,
-        port=settings.API_PORT,
+        host=app_settings.API_HOST,
+        port=app_settings.API_PORT,
         reload=True,
     )

@@ -70,7 +70,7 @@ const ShieldRadar = ({ isDefending, isBreached }) => {
             ? 'border-red-500 bg-red-500/10'
             : isDefending
             ? 'border-emerald-400 bg-emerald-500/10'
-            : 'border-slate-600 bg-slate-800/40'
+            : 'border-[var(--border-primary)] bg-[var(--card-bg)]'
         }`}
       />
       <div
@@ -79,7 +79,7 @@ const ShieldRadar = ({ isDefending, isBreached }) => {
             ? 'border-red-500/40'
             : isDefending
             ? 'border-emerald-400/40'
-            : 'border-slate-700'
+            : 'border-[var(--border-primary)]'
         }`}
       />
 
@@ -102,7 +102,7 @@ const ShieldRadar = ({ isDefending, isBreached }) => {
             ? 'bg-red-500/20 text-red-400 border border-red-500/50'
             : isDefending
             ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-            : 'bg-slate-800 text-slate-400 border border-slate-700'
+            : 'bg-[var(--card-bg)] text-[var(--text-muted)] border border-[var(--border-primary)]'
         }`}
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,7 +206,7 @@ const StatusCard = ({ isDefending = true, isProcessing = false, isBreached = fal
                   <span>3-Stage Firewall</span>
                   <span className={isDefending ? 'text-emerald-400 font-bold' : 'text-red-400'}>{isDefending ? '3/3 Active' : '0/3 Disarmed'}</span>
                 </div>
-                <div className="h-1.5 bg-slate-900 rounded-full overflow-hidden border border-white/5">
+                <div className="h-1.5 bg-[var(--card-bg)] rounded-full overflow-hidden border border-[var(--border-primary)]">
                   <motion.div
                     className="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400"
                     initial={{ width: 0 }}
@@ -268,7 +268,7 @@ const StatusCard = ({ isDefending = true, isProcessing = false, isBreached = fal
                     ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'
                     : lvl === 1
                     ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]'
-                    : 'bg-slate-800/80 border border-white/5';
+                    : 'bg-[var(--card-bg)] border border-[var(--border-primary)]';
                   return <div key={lvl} className={`h-2 rounded-sm transition-all duration-300 ${colorClass}`} />;
                 })}
               </div>

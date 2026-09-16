@@ -4,20 +4,19 @@ import { useTheme } from '../context/ThemeContext';
 import GoogleLogin from './GoogleLogin';
 
 const VIEW_TITLES = {
+  dashboard: 'Dashboard Overview',
   overview: 'Dashboard Overview',
   analytics: 'Telemetry & Analytics',
   audit: 'Audit Trail Logs',
   threats: 'Threat Intelligence',
-  dlp: 'Data Loss Prevention',
+  dlp: 'Data Loss Prevention & Policies',
   map: 'Live Threat Topography',
   rules: 'Dynamic Rule Engine',
-  fuzzer: 'Automated Red-Team',
-  rag: 'RAG Context Defense',
-  playground: 'AI Attack Sandbox',
+  fuzzer: 'Automated Red-Team Fuzzer',
+  rag: 'RAG Poisoning Scanner',
   lab: 'Attack Simulation Lab',
   chat: 'Direct Neural Link',
   projects: 'Workspace Isolation',
-  quotas: 'Token Economics',
   settings: 'System Configuration',
 };
 
@@ -38,7 +37,7 @@ const Header = ({ activeView = 'overview', backendConnected = false, user, onLog
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-20 header-bg backdrop-blur-2xl border-b border-[var(--border-accent)] z-50 transition-colors duration-300">
+    <header className="fixed top-0 left-0 right-0 h-14 header-bg backdrop-blur-2xl border-b border-[var(--border-accent)] z-50 transition-colors duration-300">
       <div className="h-full px-8 flex items-center justify-between">
         {/* Logo & Breadcrumb Path */}
         <div className="flex items-center gap-6">
@@ -50,21 +49,21 @@ const Header = ({ activeView = 'overview', backendConnected = false, user, onLog
             >
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-blue-600 blur-xl opacity-50 animate-pulse"></div>
               <motion.div
-                className="relative w-11 h-11 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg"
+                className="relative w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg"
                 whileHover={{ rotate: 180 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
               >
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </motion.div>
             </motion.div>
             <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-[var(--text-primary)] via-cyan-400 to-blue-500 bg-clip-text text-transparent tracking-tight">
+              <h1 className="text-base font-bold bg-gradient-to-r from-[var(--text-primary)] via-cyan-400 to-blue-500 bg-clip-text text-transparent tracking-tight leading-none">
                 NEURO-SENTRY
               </h1>
-              <p className="text-[10px] text-[var(--text-muted)] tracking-widest font-mono">SOVEREIGN AI OS</p>
+              <p className="text-[9px] text-[var(--text-muted)] tracking-widest font-mono mt-0.5">SOVEREIGN AI OS</p>
             </div>
           </div>
 

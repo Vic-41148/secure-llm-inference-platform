@@ -1,59 +1,85 @@
 import React, { useState } from 'react';
-import { KeyRound, ShieldCheck, Activity, ChevronRight, Eye, EyeOff } from 'lucide-react';
+import { KeyRound, ShieldCheck, Activity, Copy, Check, Eye, EyeOff, Trash2 } from 'lucide-react';
 
-const ProjectCard = ({ project }) => {
+const ProjectCard = ({ project, onDelete }) => {
     const [showKeyIndex, setShowKeyIndex] = useState(null);
+    const [copiedIndex, setCopiedIndex] = useState(null);
+
+    const handleCopy = (keyStr, idx) => {
+        navigator.clipboard.writeText(keyStr);
+        setCopiedIndex(idx);
+        setTimeout(() => setCopiedIndex(null), 1800);
+    };
 
     return (
-        <div className="bg-gray-800 p-5 rounded-xl border border-gray-700 shadow-md flex flex-col group hover:border-cyan-500 transition-colors">
-            <div className="flex justify-between items-start mb-3">
-                <h3 className="font-bold text-gray-100 text-lg group-hover:text-cyan-400 transition-colors">{project.name}</h3>
-                <span className="bg-cyan-900/40 text-cyan-500 px-2 py-0.5 rounded text-xs font-mono border border-cyan-800">
-                    ID: {project.id.substring(0, 8)}
-                </span>
-            </div>
+        <div className="glass-card p-6 rounded-2xl border border-[var(--border-primary)] shadow-xl flex flex-col justify-between group hover:border-cyan-500/50 transition-all duration-200">
+            <div>
+                <div className="flex justify-between items-start mb-3">
+                    <h3 className="font-bold text-[var(--text-primary)] text-lg group-hover:text-cyan-400 transition-colors">{project.name}</h3>
+                    <span className="bg-cyan-500/10 text-cyan-400 px-2.5 py-0.5 rounded-full text-[10px] font-mono border border-cyan-500/30">
+                        {project.id.substring(0, 8)}
+                    </span>
+                </div>
 
-            <p className="text-gray-400 text-sm mb-6 flex-1 line-clamp-2">{project.description}</p>
+                <p className="text-[var(--text-muted)] text-xs mb-5 line-clamp-2 leading-relaxed">{project.description}</p>
 
-            <div className="space-y-4">
-                <div className="bg-gray-900 rounded-lg p-3 border border-gray-700">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1">
-                            <KeyRound className="w-3 h-3 text-yellow-500" /> Active API Keys
-                        </span>
-                        <span className="text-xs bg-gray-800 px-2 rounded-full">{project.api_keys.length}</span>
-                    </div>
-                    {project.api_keys.map((key, idx) => (
-                        <div key={key.id} className="flex justify-between items-center bg-gray-800/50 p-2 rounded mt-2 border border-gray-700/50">
-                            <span className="text-xs text-gray-400">{key.name}</span>
-                            <div className="flex items-center gap-2">
-                                <span className="font-mono text-xs text-gray-300 bg-black/40 px-2 py-1 rounded">
-                                    {showKeyIndex === idx ? key.key : "sk-••••••••••••••••••••"}
-                                </span>
-                                <button
-                                    className="text-gray-500 hover:text-white transition-colors"
-                                    onClick={() => setShowKeyIndex(showKeyIndex === idx ? null : idx)}
-                                >
-                                    {showKeyIndex === idx ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                </button>
-                            </div>
+                <div className="space-y-3">
+                    <div className="bg-[var(--panel-bg)] rounded-xl p-3.5 border border-[var(--border-primary)]">
+                        <div className="flex items-center justify-between mb-2">
+                            <span className="text-[11px] font-mono font-bold text-[var(--text-secondary)] uppercase tracking-wider flex items-center gap-1.5">
+                                <KeyRound className="w-3.5 h-3.5 text-amber-400" /> Active API Keys
+                            </span>
+                            <span className="text-[10px] font-mono bg-[var(--card-bg)] px-2 py-0.5 rounded-full border border-[var(--border-primary)] text-[var(--text-muted)]">
+                                {project.api_keys?.length || 0}
+                            </span>
                         </div>
-                    ))}
-                </div>
-
-                <div className="flex gap-2">
-                    <div className="flex-1 flex items-center justify-center gap-2 bg-gray-900/50 p-2 rounded text-xs text-gray-400 border border-gray-700">
-                        <ShieldCheck className="w-4 h-4 text-green-500" /> Sec: Max
+                        {project.api_keys?.map((key, idx) => (
+                            <div key={key.id || idx} className="flex justify-between items-center bg-[var(--card-bg)] p-2.5 rounded-lg mt-2 border border-[var(--border-primary)]">
+                                <span className="text-xs font-mono font-medium text-[var(--text-secondary)]">{key.name}</span>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="font-mono text-[10px] text-[var(--text-primary)] bg-[var(--panel-bg)] px-2 py-1 rounded border border-[var(--border-primary)] select-all">
+                                        {showKeyIndex === idx ? key.key : "sk-••••••••••••••••"}
+                                    </span>
+                                    <button
+                                        className="p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+                                        onClick={() => setShowKeyIndex(showKeyIndex === idx ? null : idx)}
+                                        title={showKeyIndex === idx ? "Hide key" : "Show key"}
+                                    >
+                                        {showKeyIndex === idx ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                                    </button>
+                                    <button
+                                        className="p-1 text-[var(--text-muted)] hover:text-cyan-400 transition-colors"
+                                        onClick={() => handleCopy(key.key, idx)}
+                                        title="Copy API key"
+                                    >
+                                        {copiedIndex === idx ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
                     </div>
-                    <div className="flex-1 flex items-center justify-center gap-2 bg-gray-900/50 p-2 rounded text-xs text-gray-400 border border-gray-700">
-                        <Activity className="w-4 h-4 text-blue-500" /> 1.2k RQs
+
+                    <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                        <div className="flex items-center justify-center gap-1.5 bg-[var(--panel-bg)] p-2 rounded-xl text-[var(--text-muted)] border border-[var(--border-primary)]">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> Sec: STRICT
+                        </div>
+                        <div className="flex items-center justify-center gap-1.5 bg-[var(--panel-bg)] p-2 rounded-xl text-[var(--text-muted)] border border-[var(--border-primary)]">
+                            <Activity className="w-3.5 h-3.5 text-cyan-500" /> Live Isolated
+                        </div>
                     </div>
                 </div>
-
-                <button className="w-full mt-2 flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 text-sm font-semibold py-2 rounded-lg transition-colors">
-                    Manage Access <ChevronRight className="w-4 h-4" />
-                </button>
             </div>
+
+            {onDelete && (
+                <div className="mt-4 pt-3 border-t border-[var(--border-primary)] flex justify-end">
+                    <button
+                        onClick={() => onDelete(project.id)}
+                        className="text-[11px] font-mono text-red-400 hover:text-red-500 flex items-center gap-1 transition-colors"
+                    >
+                        <Trash2 className="w-3.5 h-3.5" /> Delete Workspace
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

@@ -6,6 +6,7 @@ const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 export default function GoogleLogin({ onLoginSuccess, onLogout }) {
     const [user, setUser] = useState(null);
+    const [imgError, setImgError] = useState(false);
     const [sdkReady, setSdkReady] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [showModal, setShowModal] = useState(false);
@@ -65,7 +66,7 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
         const payload = JSON.parse(atob(response.credential.split(".")[1]));
         const userData = { name: payload.name, email: payload.email, picture: payload.picture };
         setUser(userData);
-        setUser(userData);
+        setImgError(false);
         Cookies.set("ns_google_user", JSON.stringify(userData), { expires: 7 });
         Cookies.set("ns_google_credential", response.credential, { expires: 7 });
         setShowModal(false);
@@ -75,7 +76,9 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
     function logout() {
         Cookies.remove("ns_google_user");
         Cookies.remove("ns_google_credential");
-        setUser(null); setShowDropdown(false);
+        setUser(null);
+        setImgError(false);
+        setShowDropdown(false);
         window.google?.accounts?.id?.disableAutoSelect();
         onLogout?.();
     }
@@ -202,12 +205,12 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
                         onMouseEnter={e => e.currentTarget.style.background = "rgba(0,255,180,0.12)"}
                         onMouseLeave={e => e.currentTarget.style.background = "rgba(0,255,180,0.06)"}
                     >
-                        {user.picture
-                            ? <img src={user.picture} alt="" style={{ width: 26, height: 26, borderRadius: "50%", border: "1px solid #00ffb4" }} />
-                            : <div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,#00ffb4,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#0a0f1a" }}>{user.name.charAt(0)}</div>
+                        {user.picture && !imgError
+                            ? <img src={user.picture} alt="" referrerPolicy="no-referrer" onError={() => setImgError(true)} style={{ width: 26, height: 26, borderRadius: "50%", border: "1px solid #00ffb4", objectFit: "cover" }} />
+                            : <div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,#00ffb4,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#0a0f1a" }}>{(user.name || 'U').charAt(0).toUpperCase()}</div>
                         }
                         <div>
-                            <div style={{ fontSize: 11, fontFamily: "Courier New, monospace", color: teal, fontWeight: 700, lineHeight: 1.2 }}>{user.name.split(" ")[0].toUpperCase()}</div>
+                            <div style={{ fontSize: 11, fontFamily: "Courier New, monospace", color: teal, fontWeight: 700, lineHeight: 1.2 }}>{(user.name || 'USER').split(" ")[0].toUpperCase()}</div>
                             <div style={{ fontSize: 9, color: "rgba(0,255,180,0.5)" }}>AUTHORIZED</div>
                         </div>
                         <span style={{ color: "rgba(0,255,180,0.5)", fontSize: 10 }}>▾</span>
@@ -222,9 +225,9 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
                     }}>
                         <div style={{ padding: "14px 16px", background: "rgba(0,255,180,0.05)", borderBottom: "1px solid rgba(0,255,180,0.15)" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                                {user.picture
-                                    ? <img src={user.picture} alt="" style={{ width: 36, height: 36, borderRadius: "50%", border: "2px solid #00ffb4" }} />
-                                    : <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#00ffb4,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, color: "#0a0f1a" }}>{user.name.charAt(0)}</div>
+                                {user.picture && !imgError
+                                    ? <img src={user.picture} alt="" referrerPolicy="no-referrer" onError={() => setImgError(true)} style={{ width: 36, height: 36, borderRadius: "50%", border: "2px solid #00ffb4", objectFit: "cover" }} />
+                                    : <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#00ffb4,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, color: "#0a0f1a" }}>{(user.name || 'U').charAt(0).toUpperCase()}</div>
                                 }
                                 <div>
                                     <div style={{ fontSize: 13, fontWeight: 700, color: "#e2f8f0", fontFamily: "Courier New, monospace" }}>{user.name}</div>

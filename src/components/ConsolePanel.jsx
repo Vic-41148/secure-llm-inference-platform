@@ -16,7 +16,7 @@ const ConsolePanel = ({ logs = [] }) => {
       initial={false}
       animate={{ height: isOpen ? 220 : 38 }}
       transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-      className="fixed bottom-0 left-0 right-0 z-40 bg-[var(--console-bg)] backdrop-blur-2xl border-t border-[var(--border-accent)] font-mono text-xs flex flex-col overflow-hidden shadow-[0_-8px_30px_rgba(0,0,0,0.5)] transition-colors duration-300 select-none"
+      className="fixed bottom-7 left-0 right-0 z-40 bg-[var(--console-bg)] backdrop-blur-2xl border-t border-[var(--border-accent)] font-mono text-xs flex flex-col overflow-hidden shadow-[0_-8px_30px_rgba(0,0,0,0.5)] transition-colors duration-300 select-none"
     >
       {/* Header bar (clickable to toggle open/closed) */}
       <div

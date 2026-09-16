@@ -13,14 +13,11 @@ import RedTeamFuzzer from './components/RedTeamFuzzer';
 import ThreatMap from './components/ThreatMap';
 import RagScanner from './components/RagScanner';
 import IndexPage from './components/IndexPage';
-import AppPlayground from './components/playground/Playground';
 import AnalyticsDashboard from './components/analytics/AnalyticsDashboard';
 import AuditLogs from './components/audit/AuditLogs';
 import ThreatIntelBoard from './components/security/ThreatIntelBoard';
 import PiiSettings from './components/security/PiiSettings';
 import ProjectList from './components/projects/ProjectList';
-import SettingsLayout from './components/settings/SettingsLayout';
-import Quotas from './components/quotas/Quotas';
 import Sidebar from './components/Sidebar';
 import CommandPalette from './components/CommandPalette';
 import ToastContainer from './components/ToastContainer';
@@ -166,7 +163,7 @@ function AppInner() {
         onOpenCommandPalette={() => setCommandPaletteOpen(true)}
       />
 
-      <div className="fixed top-20 bottom-7 left-0 right-0 flex overflow-hidden">
+      <div className="fixed top-14 bottom-7 left-0 right-0 flex overflow-hidden">
 
         <Sidebar activeView={activeView} onNavigate={setActiveView} />
 
@@ -179,43 +176,19 @@ function AppInner() {
             />
           )}
 
-          <main className="flex-1 overflow-y-auto scrollbar-hide pb-12">
+          <main className="flex-1 overflow-y-auto scrollbar-hide pb-20">
             <AnimatePresence mode="wait">
-              {activeView === 'dashboard' ? (
+              {activeView === 'dashboard' || activeView === 'overview' ? (
                 <motion.div key="dashboard" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
                   <Dashboard isDefending={isDefending} isProcessing={isProcessing} isBreached={isBreached} stats={stats} onNavigate={setActiveView} />
                 </motion.div>
-              ) : activeView === 'analytics' ? (
-                <motion.div key="analytics" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
-                  <AnalyticsDashboard />
+              ) : activeView === 'lab' ? (
+                <motion.div key="lab" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <AttackLab attack={selectedAttack} isSimulating={isProcessing} onSimulate={handleSimulate} />
                 </motion.div>
-              ) : activeView === 'audit' ? (
-                <motion.div key="audit" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
-                  <AuditLogs />
-                </motion.div>
-              ) : activeView === 'threats' ? (
-                <motion.div key="threats" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
-                  <ThreatIntelBoard />
-                </motion.div>
-              ) : activeView === 'dlp' ? (
-                <motion.div key="dlp" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
-                  <PiiSettings />
-                </motion.div>
-              ) : activeView === 'projects' ? (
-                <motion.div key="projects" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
-                  <ProjectList />
-                </motion.div>
-              ) : activeView === 'quotas' ? (
-                <motion.div key="quotas" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
-                  <Quotas />
-                </motion.div>
-              ) : activeView === 'settings' ? (
-                <motion.div key="settings" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
-                  <SettingsLayout />
-                </motion.div>
-              ) : activeView === 'map' ? (
-                <motion.div key="map" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
-                  <ThreatMap />
+              ) : activeView === 'chat' ? (
+                <motion.div key="chat" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <DirectChat backendConnected={backendConnected} />
                 </motion.div>
               ) : activeView === 'rules' ? (
                 <motion.div key="rules" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
@@ -229,17 +202,33 @@ function AppInner() {
                 <motion.div key="rag" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
                   <RagScanner />
                 </motion.div>
-              ) : activeView === 'playground' ? (
-                <motion.div key="playground" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
-                  <AppPlayground />
+              ) : activeView === 'map' ? (
+                <motion.div key="map" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <ThreatMap />
                 </motion.div>
-              ) : activeView === 'chat' ? (
-                <motion.div key="chat" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
-                  <DirectChat backendConnected={backendConnected} />
+              ) : activeView === 'threats' ? (
+                <motion.div key="threats" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <ThreatIntelBoard />
+                </motion.div>
+              ) : activeView === 'analytics' ? (
+                <motion.div key="analytics" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <AnalyticsDashboard />
+                </motion.div>
+              ) : activeView === 'audit' ? (
+                <motion.div key="audit" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <AuditLogs />
+                </motion.div>
+              ) : activeView === 'dlp' ? (
+                <motion.div key="dlp" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <PiiSettings />
+                </motion.div>
+              ) : activeView === 'projects' ? (
+                <motion.div key="projects" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <ProjectList />
                 </motion.div>
               ) : (
-                <motion.div key="lab" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
-                  <AttackLab attack={selectedAttack} isSimulating={isProcessing} onSimulate={handleSimulate} />
+                <motion.div key="fallback" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+                  <Dashboard isDefending={isDefending} isProcessing={isProcessing} isBreached={isBreached} stats={stats} onNavigate={setActiveView} />
                 </motion.div>
               )}
             </AnimatePresence>
