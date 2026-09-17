@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import LogViewer from './LogViewer';
 import LogFilter from './LogFilter';
-import { FileText, ShieldCheck, Download } from 'lucide-react';
+import { FileText, ShieldCheck, Download, RefreshCw } from 'lucide-react';
+import { getAuditLogs } from '../../services/api';
 
 const FALLBACK_LOGS = [
     { id: 'log-101', timestamp: new Date(Date.now() - 60000).toISOString(), action: 'INTERCEPT_PAYLOAD', actor: 'rule-engine-v2', resource: '/api/v1/chat', status: 'BLOCKED', metadata: { threat: 'SQL_INJECTION', confidence: 0.99, ip: '185.220.101.4' } },
@@ -16,22 +17,36 @@ const FALLBACK_LOGS = [
 const AuditLogs = () => {
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const [filter, setFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('ALL');
 
-    useEffect(() => {
-        fetch('http://localhost:8000/api/audit_logs/all?limit=100')
-            .then(res => res.json())
-            .then(data => {
-                if (data.logs && data.logs.length > 0) setLogs(data.logs);
-                else setLogs(FALLBACK_LOGS);
-                setLoading(false);
-            })
-            .catch(() => {
+    const fetchLogs = useCallback(async (isManual = false) => {
+        if (isManual) setIsRefreshing(true);
+        try {
+            const data = await getAuditLogs(100);
+            if (data.logs && Array.isArray(data.logs) && data.logs.length > 0) {
+                setLogs(data.logs);
+            } else {
                 setLogs(FALLBACK_LOGS);
-                setLoading(false);
-            });
+            }
+        } catch (error) {
+            console.warn("Audit logs service unavailable, using fallback buffer:", error);
+            setLogs(prev => prev.length > 0 ? prev : FALLBACK_LOGS);
+        } finally {
+            setLoading(false);
+            if (isManual) setTimeout(() => setIsRefreshing(false), 400);
+        }
     }, []);
+
+    useEffect(() => {
+        fetchLogs(false);
+        // Poll for new audit logs every 8 seconds
+        const interval = setInterval(() => {
+            fetchLogs(false);
+        }, 8000);
+        return () => clearInterval(interval);
+    }, [fetchLogs]);
 
     const filteredLogs = logs.filter(log => {
         const matchesQuery = 
@@ -71,6 +86,14 @@ const AuditLogs = () => {
 
                 <div className="flex items-center gap-3">
                     <button
+                        onClick={() => fetchLogs(true)}
+                        disabled={isRefreshing}
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--card-bg)] border border-[var(--border-primary)] text-[var(--text-primary)] text-xs font-mono font-bold hover:border-cyan-500/40 transition-all shadow-sm active:scale-95"
+                    >
+                        <RefreshCw className={`w-3.5 h-3.5 text-cyan-400 ${isRefreshing ? 'animate-spin' : ''}`} />
+                        <span>{isRefreshing ? 'Syncing...' : 'Sync'}</span>
+                    </button>
+                    <button
                         onClick={exportLogs}
                         className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--card-bg)] border border-[var(--border-primary)] text-[var(--text-primary)] text-xs font-mono font-bold hover:border-cyan-500/40 transition-all shadow-sm"
                     >
@@ -89,7 +112,7 @@ const AuditLogs = () => {
                 
                 {/* Status Badges Filter */}
                 <div className="flex items-center gap-1.5">
-                    {['ALL', 'BLOCKED', 'SANITIZED', 'CLEARED', 'SUCCESS'].map((st) => (
+                    {['ALL', 'BLOCKED', 'SANITIZED', 'CLEARED', 'SUCCESS', 'AUTHORIZED'].map((st) => (
                         <button
                             key={st}
                             onClick={() => setStatusFilter(st)}

@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { BarChart3 } from 'lucide-react';
+import { getUsageTimeSeries } from '../../services/api';
 
 const DEMO_DATA = Array.from({ length: 24 }, (_, i) => ({
     timestamp: new Date(Date.now() - (23 - i) * 3600000).toISOString(),
@@ -9,12 +10,22 @@ const DEMO_DATA = Array.from({ length: 24 }, (_, i) => ({
 const UsageChart = () => {
     const [data, setData] = useState(DEMO_DATA);
 
-    useEffect(() => {
-        fetch('http://localhost:8000/api/analytics/timeseries/usage?hours=24')
-            .then(res => res.json())
-            .then(resData => { if (resData.data && resData.data.length > 0) setData(resData.data); })
-            .catch(() => { });
+    const fetchUsage = useCallback(async () => {
+        try {
+            const resData = await getUsageTimeSeries(24);
+            if (resData.data && Array.isArray(resData.data) && resData.data.length > 0) {
+                setData(resData.data);
+            }
+        } catch (e) {
+            // Keep demo data on error
+        }
     }, []);
+
+    useEffect(() => {
+        fetchUsage();
+        const interval = setInterval(fetchUsage, 8000);
+        return () => clearInterval(interval);
+    }, [fetchUsage]);
 
     const maxVal = Math.max(...data.map(d => d.value), 1);
 

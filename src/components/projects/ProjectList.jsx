@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import ProjectCard from './ProjectCard';
 import { Briefcase, Plus, ShieldCheck } from 'lucide-react';
 
+import { getProjects } from '../../services/api';
+
 const STORAGE_KEY = 'ns_projects';
 
 const DEFAULT_PROJECTS = [
@@ -37,9 +39,7 @@ const ProjectList = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Try backend first
-        fetch('http://localhost:8000/api/projects/')
-            .then(res => res.json())
+        getProjects()
             .then(data => {
                 if (Array.isArray(data) && data.length > 0) {
                     setProjects(data);

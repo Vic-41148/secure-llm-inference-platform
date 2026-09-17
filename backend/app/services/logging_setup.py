@@ -75,8 +75,16 @@ def setup_logging() -> str:
     )
     file_handler.setFormatter(formatter)
 
-    # Console handler (plain text always)
-    console_handler = logging.StreamHandler()
+    # Console handler (plain text with safe error handling on Windows)
+    import sys
+    if hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
+    console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(
         logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s")
     )

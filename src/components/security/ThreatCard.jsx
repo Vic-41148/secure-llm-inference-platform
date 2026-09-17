@@ -1,9 +1,12 @@
-import React from 'react';
-import { Target, UserX, AlertTriangle, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
+import { Target, UserX, AlertTriangle, ShieldCheck, Check, Clock } from 'lucide-react';
 
-const ThreatCard = ({ threat }) => {
+const ThreatCard = ({ threat, onBlock }) => {
+  const [isBlocked, setIsBlocked] = useState(threat.isBlocked || false);
+  const [isBlocking, setIsBlocking] = useState(false);
+
   const getBadgeStyle = (sev) => {
-    switch (sev.toLowerCase()) {
+    switch ((sev || '').toLowerCase()) {
       case 'critical':
         return 'text-red-500 bg-red-500/10 border-red-500/30';
       case 'high':
@@ -16,10 +19,25 @@ const ThreatCard = ({ threat }) => {
   };
 
   const getBorderGlow = (sev) => {
-    switch (sev.toLowerCase()) {
+    switch ((sev || '').toLowerCase()) {
       case 'critical': return 'hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.15)]';
       case 'high': return 'hover:border-amber-500/50 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)]';
       default: return 'hover:border-blue-500/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.15)]';
+    }
+  };
+
+  const handleBlock = async () => {
+    if (isBlocked || isBlocking) return;
+    setIsBlocking(true);
+    try {
+      if (onBlock) {
+        await onBlock(threat);
+      }
+      setIsBlocked(true);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsBlocking(false);
     }
   };
 
@@ -52,10 +70,28 @@ const ThreatCard = ({ threat }) => {
       </div>
 
       <div className="pt-3 border-t border-[var(--border-primary)] flex items-center justify-between">
-        <span className="text-[10px] font-mono text-[var(--text-muted)]">THREAT_STATUS: MONITORED</span>
-        <button className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-500 hover:text-cyan-400 transition-colors flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30">
-          <ShieldCheck className="w-3.5 h-3.5" />
-          Add to Blocklist
+        <span className="text-[10px] font-mono text-[var(--text-muted)] flex items-center gap-1">
+          <Clock className="w-3 h-3" />
+          {threat.last_seen || 'MONITORED'}
+        </span>
+        <button
+          onClick={handleBlock}
+          disabled={isBlocked || isBlocking}
+          className={`text-xs font-mono font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 px-2.5 py-1 rounded-lg border ${
+            isBlocked
+              ? 'bg-red-500/20 text-red-400 border-red-500/40 cursor-default'
+              : isBlocking
+              ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30 opacity-70 cursor-wait'
+              : 'text-cyan-500 hover:text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 border-cyan-500/30 active:scale-95'
+          }`}
+        >
+          {isBlocked ? (
+            <><Check className="w-3.5 h-3.5" /> Blocked</>
+          ) : isBlocking ? (
+            <><span className="w-3 h-3 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" /> Blocking...</>
+          ) : (
+            <><ShieldCheck className="w-3.5 h-3.5" /> Add to Blocklist</>
+          )}
         </button>
       </div>
     </div>

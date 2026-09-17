@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import PromptCard from './PromptCard';
 import { BookOpen } from 'lucide-react';
+import { getPromptLibrary } from '../../services/api';
 
 const PromptLibrary = ({ onLoadPrompt }) => {
     const [prompts, setPrompts] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch mock library from backend
-        fetch('http://localhost:8000/api/playground/prompts')
-            .then(res => res.json())
+        getPromptLibrary()
             .then(data => {
                 if (data.prompts) setPrompts(data.prompts);
                 setLoading(false);
             })
             .catch(err => {
-                console.error("Failed to load prompts:", err);
+                console.warn("Using local prompts (library endpoint unavailable):", err);
                 setLoading(false);
             });
     }, []);

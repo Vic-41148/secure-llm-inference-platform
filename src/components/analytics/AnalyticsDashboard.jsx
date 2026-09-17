@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import MetricCard from './MetricCard';
 import UsageChart from './UsageChart';
 import SecurityEventsTable from './SecurityEventsTable';
-import { Activity, ShieldCheck, Zap, Sparkles } from 'lucide-react';
+import { Activity, ShieldCheck, Zap, Sparkles, RefreshCw } from 'lucide-react';
+import { getAnalyticsSummary, getSecurityEvents } from '../../services/api';
 
 const DEMO_SUMMARY = {
     total_requests: 14892,
@@ -23,19 +24,39 @@ const DEMO_EVENTS = [
 const AnalyticsDashboard = () => {
     const [summary, setSummary] = useState(DEMO_SUMMARY);
     const [events, setEvents] = useState(DEMO_EVENTS);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const fetchTelemetry = useCallback(async (isManual = false) => {
+        if (isManual) setIsRefreshing(true);
+        try {
+            const sumData = await getAnalyticsSummary();
+            if (sumData && sumData.total_requests !== undefined) {
+                setSummary(sumData);
+            }
+        } catch (e) {
+            // Keep demo summary if backend unreachable
+        }
+
+        try {
+            const evData = await getSecurityEvents(10);
+            if (evData && evData.events && evData.events.length > 0) {
+                setEvents(evData.events);
+            }
+        } catch (e) {
+            // Keep demo events if backend unreachable
+        }
+
+        if (isManual) setTimeout(() => setIsRefreshing(false), 400);
+    }, []);
 
     useEffect(() => {
-        // Try backend, fall back gracefully
-        fetch('http://localhost:8000/api/analytics/summary')
-            .then(res => res.json())
-            .then(data => { if (data.total_requests !== undefined) setSummary(data); })
-            .catch(() => { });
-
-        fetch('http://localhost:8000/api/analytics/security-events?limit=10')
-            .then(res => res.json())
-            .then(data => { if (data.events && data.events.length > 0) setEvents(data.events); })
-            .catch(() => { });
-    }, []);
+        fetchTelemetry(false);
+        // Live telemetry polling every 6 seconds
+        const interval = setInterval(() => {
+            fetchTelemetry(false);
+        }, 6000);
+        return () => clearInterval(interval);
+    }, [fetchTelemetry]);
 
     return (
         <div className="p-8 space-y-6 h-full flex flex-col overflow-y-auto scrollbar-hide">
@@ -50,18 +71,28 @@ const AnalyticsDashboard = () => {
                         <p className="text-xs text-[var(--text-muted)] font-mono mt-0.5">Real-time inference load, token metrics, and threat frequency</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 font-mono text-xs font-bold">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    STREAM SYNCHRONIZED
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => fetchTelemetry(true)}
+                        disabled={isRefreshing}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--card-bg)] border border-[var(--border-primary)] text-[var(--text-primary)] text-xs font-mono font-bold hover:border-cyan-500/40 transition-all shadow-sm active:scale-95"
+                    >
+                        <RefreshCw className={`w-3.5 h-3.5 text-cyan-400 ${isRefreshing ? 'animate-spin' : ''}`} />
+                        <span>{isRefreshing ? 'Syncing...' : 'Sync Telemetry'}</span>
+                    </button>
+                    <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 font-mono text-xs font-bold">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        STREAM SYNCHRONIZED
+                    </div>
                 </div>
             </div>
 
             {/* Metric Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-shrink-0">
-                <MetricCard title="Total Inferences" value={summary.total_requests.toLocaleString()} icon="activity" color="text-blue-500" trend="14.2%" />
-                <MetricCard title="Tokens Processed" value={summary.total_tokens.toLocaleString()} icon="cpu" color="text-cyan-500" trend="8.7%" />
-                <MetricCard title="Mean Latency" value={`${summary.avg_latency.toFixed(1)}ms`} icon="clock" color="text-emerald-500" />
-                <MetricCard title="Threats Neutralized" value={summary.security_incidents} icon="shield" color="text-red-500" />
+                <MetricCard title="Total Inferences" value={Number(summary.total_requests || 0).toLocaleString()} icon="activity" color="text-blue-500" trend="14.2%" />
+                <MetricCard title="Tokens Processed" value={Number(summary.total_tokens || 0).toLocaleString()} icon="cpu" color="text-cyan-500" trend="8.7%" />
+                <MetricCard title="Mean Latency" value={`${Number(summary.avg_latency || 0).toFixed(1)}ms`} icon="clock" color="text-emerald-500" />
+                <MetricCard title="Threats Neutralized" value={summary.security_incidents || 0} icon="shield" color="text-red-500" />
             </div>
 
             {/* Charts and Tables */}

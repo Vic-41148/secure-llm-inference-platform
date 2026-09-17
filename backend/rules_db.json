@@ -14,5 +14,21 @@
     "pattern": "system prompt,credentials,api key",
     "action": "block",
     "active": true
+  },
+  {
+    "id": "df0d289d-32d7-4586-8cbd-961d075d03d9",
+    "name": "ThreatIntel Block: Test Operator (sk-live-compromised-)",
+    "type": "keyword",
+    "pattern": "sk-live-compromised-token-12345",
+    "action": "block",
+    "active": true
+  },
+  {
+    "id": "df677565-b35a-49a3-965d-2b65c3679a85",
+    "name": "ThreatIntel Block: APT-29 (Cozy Bear) (C2: 185.220.101.44 /)",
+    "type": "keyword",
+    "pattern": "C2: 185.220.101.44 / TTP: T1059.001",
+    "action": "block",
+    "active": true
   }
 ]
