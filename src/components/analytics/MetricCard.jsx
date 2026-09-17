@@ -8,17 +8,22 @@ const icons = {
     cpu: Cpu
 };
 
-const MetricCard = ({ title, value, icon, color }) => {
+const MetricCard = ({ title, value, icon, color = 'text-cyan-500', trend }) => {
     const IconComponent = icons[icon] || Activity;
 
     return (
-        <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-md flex items-center justify-between">
+        <div className="glass-card p-5 rounded-2xl border border-[var(--border-primary)] shadow-lg flex items-center justify-between transition-all duration-200 hover:border-cyan-500/40 hover:scale-[1.01]">
             <div>
-                <p className="text-gray-400 text-sm mb-1">{title}</p>
-                <p className="text-3xl font-bold font-mono tracking-tight text-white">{value}</p>
+                <p className="text-[var(--text-muted)] text-xs font-mono uppercase tracking-wider mb-1">{title}</p>
+                <p className="text-2xl lg:text-3xl font-bold font-mono tracking-tight text-[var(--text-primary)]">{value}</p>
+                {trend && (
+                    <span className="text-[10px] font-mono text-emerald-500 font-bold mt-1 inline-block">
+                        ↑ {trend} vs last cycle
+                    </span>
+                )}
             </div>
-            <div className={`p-4 bg-gray-900 rounded-lg ${color}`}>
-                <IconComponent className="w-8 h-8" />
+            <div className={`p-3.5 rounded-xl bg-[var(--panel-bg)] border border-[var(--border-primary)] ${color} shadow-sm flex items-center justify-center`}>
+                <IconComponent className="w-6 h-6" />
             </div>
         </div>
     );

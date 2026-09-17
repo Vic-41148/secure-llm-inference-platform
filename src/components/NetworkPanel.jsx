@@ -14,6 +14,9 @@ const NetworkPanel = ({ backendConnected }) => {
   const [networkInfo, setNetworkInfo] = useState({ localUrl: '', networkUrl: '', apiUrl: '', mode: 'local' });
 
   useEffect(() => {
+    const handleOpenNetwork = () => setIsOpen(true);
+    window.addEventListener('ns-open-network', handleOpenNetwork);
+
     const initializeNetwork = async () => {
       try {
         setQrCodesLoading(true); setQrError(null);
@@ -34,6 +37,8 @@ const NetworkPanel = ({ backendConnected }) => {
       finally { setQrCodesLoading(false); }
     };
     initializeNetwork();
+
+    return () => window.removeEventListener('ns-open-network', handleOpenNetwork);
   }, []);
 
   const copyToClipboard = (text, label) => {
@@ -66,20 +71,20 @@ const NetworkPanel = ({ backendConnected }) => {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Action Button Docked Above Console */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 p-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 rounded-2xl shadow-2xl shadow-cyan-500/20 transition-all duration-300 group"
-        whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+        className="fixed bottom-12 right-6 z-30 px-3.5 py-2 glass-card bg-gradient-to-r from-cyan-500/20 to-blue-600/20 hover:from-cyan-500/30 hover:to-blue-600/30 rounded-xl border border-cyan-500/40 shadow-xl shadow-cyan-500/10 transition-all duration-300 group"
+        whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <div className="relative">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
             </svg>
-            {backendConnected && <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white animate-pulse"></span>}
+            {backendConnected && <span className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-400 rounded-full border border-white animate-pulse"></span>}
           </div>
-          <span className="text-sm font-bold text-white uppercase tracking-wider hidden sm:block">Network</span>
+          <span className="text-xs font-mono font-bold text-cyan-300 uppercase tracking-wider hidden sm:block">WiFi Link</span>
         </div>
       </motion.button>
 

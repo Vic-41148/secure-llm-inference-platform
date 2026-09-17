@@ -23,7 +23,7 @@ const RoutingDashboard = () => {
     }, []);
 
     return (
-        <div className="flex flex-col h-full bg-gray-900 text-white p-6 gap-6 overflow-y-auto w-full">
+        <div className="flex flex-col h-full bg-[var(--bg-body)] text-[var(--text-primary)] p-6 gap-6 overflow-y-auto w-full">
             <div>
                 <h1 className="text-2xl font-bold font-mono text-cyan-400 mb-2 flex items-center gap-3">
                     <Route className="w-6 h-6" /> ROUTING & OPTIMIZATION

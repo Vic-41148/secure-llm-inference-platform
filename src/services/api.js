@@ -19,7 +19,7 @@ const getApiBaseUrl = () => {
   return `http://${hostname}:${port}`;
 };
 
-const API_BASE_URL = import.meta.env.VITE_API_URL === 'auto'
+export const API_BASE_URL = import.meta.env.VITE_API_URL === 'auto'
   ? getApiBaseUrl()
   : (import.meta.env.VITE_API_URL || getApiBaseUrl());
 
@@ -34,7 +34,6 @@ const api = axios.create({
 // Add request interceptor - attach auth token
 api.interceptors.request.use(
   (config) => {
-    const userData = sessionStorage.getItem("ns_google_user");
     const credential = sessionStorage.getItem("ns_google_credential");
     if (credential) {
       config.headers.Authorization = `Bearer ${credential}`;
@@ -79,6 +78,78 @@ export const getSystemStats = async () => {
 export const getLogs = async (limit = 50) => {
   try {
     const response = await api.get(`/api/logs?limit=${limit}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAuditLogs = async (limit = 100, skip = 0) => {
+  try {
+    const response = await api.get(`/api/audit_logs/all?limit=${limit}&skip=${skip}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getThreatIntelFeeds = async () => {
+  try {
+    const response = await api.get('/api/threat-intel/');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const blockThreatIOC = async (ioc, actor = 'Unknown', reason = 'Manual block from Threat Board') => {
+  try {
+    const response = await api.post('/api/threat-intel/block', { ioc, actor, reason });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAnalyticsSummary = async () => {
+  try {
+    const response = await api.get('/api/analytics/summary');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getUsageTimeSeries = async (hours = 24) => {
+  try {
+    const response = await api.get(`/api/analytics/timeseries/usage?hours=${hours}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getSecurityEvents = async (limit = 50) => {
+  try {
+    const response = await api.get(`/api/analytics/security-events?limit=${limit}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getProjects = async () => {
+  try {
+    const response = await api.get('/api/projects/');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getPromptLibrary = async () => {
+  try {
+    const response = await api.get('/api/playground/prompts');
     return response.data;
   } catch (error) {
     throw error;

@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-
-const STORAGE_KEY = 'ns_rules';
+import { Shield, Plus, Trash2, CheckCircle2, AlertTriangle, Play } from 'lucide-react';
 
 const DEFAULT_RULES = [
     { id: 'r1', name: 'SQL Injection Pattern', type: 'regex', pattern: '(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER)\\s', action: 'block' },
     { id: 'r2', name: 'Jailbreak Keywords', type: 'keyword', pattern: 'DAN mode, ignore previous instructions, you are now, bypass your rules', action: 'block' },
     { id: 'r3', name: 'PII Extraction', type: 'keyword', pattern: 'social security, credit card number, SSN, bank account', action: 'block' },
     { id: 'r4', name: 'System Prompt Leak', type: 'keyword', pattern: 'reveal your system prompt, show me your instructions, what are your rules', action: 'block' },
-    { id: 'r5', name: 'Base64 Payload', type: 'regex', pattern: '[A-Za-z0-9+/]{50,}={0,2}', action: 'block' },
+    { id: 'r5', name: 'API Key Patterns', type: 'regex', pattern: '(sk-[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{20,})', action: 'block' },
 ];
 
 const RuleBuilder = () => {
@@ -18,25 +17,24 @@ const RuleBuilder = () => {
     const [testResult, setTestResult] = useState(null);
 
     useEffect(() => {
-        const stored = localStorage.getItem(STORAGE_KEY);
+        const stored = localStorage.getItem('ns_custom_rules');
         if (stored) {
             try { setRules(JSON.parse(stored)); } catch { setRules(DEFAULT_RULES); }
         } else {
             setRules(DEFAULT_RULES);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_RULES));
         }
         setLoading(false);
     }, []);
 
     const saveRules = (updated) => {
         setRules(updated);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        localStorage.setItem('ns_custom_rules', JSON.stringify(updated));
     };
 
     const handleAddRule = (e) => {
         e.preventDefault();
         if (!newRule.name || !newRule.pattern) return;
-        const rule = { ...newRule, id: 'r-' + Date.now() };
+        const rule = { id: `r-${Date.now()}`, ...newRule };
         saveRules([...rules, rule]);
         setNewRule({ name: '', type: 'keyword', pattern: '', action: 'block' });
     };
@@ -46,7 +44,7 @@ const RuleBuilder = () => {
     };
 
     const handleTestRule = () => {
-        if (!testText) return;
+        if (!testText.trim()) return;
         const lowerText = testText.toLowerCase();
         let blocked = false;
         let matchedRule = null;
@@ -69,7 +67,7 @@ const RuleBuilder = () => {
                         blocked = true;
                         matchedRule = rule.name;
                     }
-                } catch { /* invalid regex — skip */ }
+                } catch { }
             }
         }
 
@@ -81,78 +79,135 @@ const RuleBuilder = () => {
     };
 
     return (
-        <div className="space-y-6 animate-fade-in">
+        <div className="p-8 space-y-6 h-full flex flex-col overflow-y-auto scrollbar-hide">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Rule Management */}
-                <div className="glass-panel p-6 shadow-glow">
-                    <h2 className="text-xl font-orbitron text-ns-blue mb-4 flex items-center">
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-                        Dynamic Rules Engine
-                        <span className="ml-auto text-xs font-mono text-emerald-400 bg-emerald-900/30 px-2 py-1 rounded">{rules.length} rules</span>
-                    </h2>
-
-                    <form onSubmit={handleAddRule} className="space-y-4 mb-6 p-4 bg-ns-darker rounded-lg border border-ns-dark-border">
-                        <h3 className="text-sm text-gray-400 uppercase tracking-wider">Add New Rule</h3>
-                        <div className="grid grid-cols-2 gap-4">
-                            <input className="ns-input col-span-2" placeholder="Rule Name (e.g. Block API Keys)" value={newRule.name} onChange={e => setNewRule({ ...newRule, name: e.target.value })} />
-                            <select className="ns-select" value={newRule.type} onChange={e => setNewRule({ ...newRule, type: e.target.value })}>
-                                <option value="keyword">Keyword Match</option>
-                                <option value="regex">Regex Match</option>
-                            </select>
-                            <select className="ns-select" value={newRule.action} onChange={e => setNewRule({ ...newRule, action: e.target.value })}>
-                                <option value="block">Block</option>
-                                <option value="flag">Flag</option>
-                            </select>
-                            <input className="ns-input col-span-2" placeholder={newRule.type === 'regex' ? "^[a-zA-Z0-9]+$" : "keyword1, keyword2"} value={newRule.pattern} onChange={e => setNewRule({ ...newRule, pattern: e.target.value })} />
-                            <button type="submit" className="ns-btn-primary col-span-2">Deploy Rule</button>
+                <div className="glass-card p-6 rounded-2xl border border-[var(--border-accent)] shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-500 flex items-center justify-center">
+                                    <Shield className="w-5 h-5" />
+                                </div>
+                                <h2 className="text-xl font-bold text-[var(--text-primary)]">
+                                    Dynamic Rules Engine
+                                </h2>
+                            </div>
+                            <span className="text-xs font-mono font-bold text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/30">
+                                {rules.length} RULES ACTIVE
+                            </span>
                         </div>
-                    </form>
 
-                    <div className="max-h-[300px] overflow-y-auto pr-2">
-                        {loading ? <p className="text-gray-400">Loading rules...</p> :
-                            rules.length === 0 ? <p className="text-gray-500 text-center py-4">No rules deployed. Add one above.</p> :
-                                rules.map(rule => (
-                                    <div key={rule.id} className="flex flex-col p-3 mb-2 bg-ns-darker rounded border border-ns-dark-border">
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <span className="text-indigo-400 font-semibold">{rule.name}</span>
-                                                <span className="ml-2 text-xs px-2 py-0.5 rounded bg-gray-800 text-gray-400">{rule.type}</span>
-                                            </div>
-                                            <button onClick={() => handleDeleteRule(rule.id)} className="text-red-500 hover:text-red-400">
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                            </button>
+                        {/* Add Rule Form */}
+                        <form onSubmit={handleAddRule} className="space-y-3 mb-6 p-4 rounded-xl bg-[var(--panel-bg)] border border-[var(--border-primary)] shadow-sm">
+                            <h3 className="text-xs font-mono font-bold text-[var(--text-muted)] uppercase tracking-wider">Add Defense Rule</h3>
+                            <div className="grid grid-cols-2 gap-3">
+                                <input
+                                    className="col-span-2 w-full px-3 py-2 bg-[var(--card-bg)] border border-[var(--border-primary)] rounded-lg text-sm text-[var(--text-primary)] focus:outline-none focus:border-cyan-500 placeholder:text-[var(--text-muted)]"
+                                    placeholder="Rule Name (e.g. Block API Keys)"
+                                    value={newRule.name}
+                                    onChange={e => setNewRule({ ...newRule, name: e.target.value })}
+                                />
+                                <select
+                                    className="w-full px-3 py-2 bg-[var(--card-bg)] border border-[var(--border-primary)] rounded-lg text-sm text-[var(--text-primary)] focus:outline-none focus:border-cyan-500"
+                                    value={newRule.type}
+                                    onChange={e => setNewRule({ ...newRule, type: e.target.value })}
+                                >
+                                    <option value="keyword">Keyword Match</option>
+                                    <option value="regex">Regex Match</option>
+                                </select>
+                                <select
+                                    className="w-full px-3 py-2 bg-[var(--card-bg)] border border-[var(--border-primary)] rounded-lg text-sm text-[var(--text-primary)] focus:outline-none focus:border-cyan-500"
+                                    value={newRule.action}
+                                    onChange={e => setNewRule({ ...newRule, action: e.target.value })}
+                                >
+                                    <option value="block">Hard Block</option>
+                                    <option value="flag">Flag & Log</option>
+                                </select>
+                                <input
+                                    className="col-span-2 w-full px-3 py-2 bg-[var(--card-bg)] border border-[var(--border-primary)] rounded-lg text-sm text-[var(--text-primary)] focus:outline-none focus:border-cyan-500 placeholder:text-[var(--text-muted)] font-mono text-xs"
+                                    placeholder={newRule.type === 'regex' ? "^[a-zA-Z0-9]+$" : "keyword1, keyword2, keyword3"}
+                                    value={newRule.pattern}
+                                    onChange={e => setNewRule({ ...newRule, pattern: e.target.value })}
+                                />
+                                <button
+                                    type="submit"
+                                    className="col-span-2 py-2.5 rounded-lg font-mono text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-cyan-500 to-blue-600 !text-white shadow-md shadow-cyan-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+                                >
+                                    <Plus className="w-4 h-4 text-white" />
+                                    Deploy Rule
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {/* Rules List */}
+                    <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
+                        {loading ? (
+                            <p className="text-xs text-[var(--text-muted)] font-mono text-center py-4">Loading rules...</p>
+                        ) : rules.length === 0 ? (
+                            <p className="text-xs text-[var(--text-muted)] font-mono text-center py-4">No custom rules deployed. Create one above.</p>
+                        ) : (
+                            rules.map(rule => (
+                                <div key={rule.id} className="flex flex-col p-3 rounded-xl bg-[var(--panel-bg)] border border-[var(--border-primary)] hover:border-cyan-500/40 transition-colors shadow-sm">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm font-bold text-[var(--text-primary)]">{rule.name}</span>
+                                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 uppercase">{rule.type}</span>
                                         </div>
-                                        <code className="mt-2 text-xs text-ns-green font-mono opacity-80 break-all">{rule.pattern}</code>
+                                        <button onClick={() => handleDeleteRule(rule.id)} className="text-red-400 hover:text-red-500 p-1 transition-colors" title="Delete rule">
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
                                     </div>
-                                ))}
+                                    <code className="mt-1.5 text-xs text-emerald-500 font-mono break-all bg-[var(--card-bg)] px-2 py-1 rounded border border-[var(--border-primary)]">{rule.pattern}</code>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
 
                 {/* Testing Sandbox */}
-                <div className="glass-panel p-6 shadow-glow border-t-2 border-indigo-500">
-                    <h2 className="text-xl font-orbitron text-indigo-400 mb-4 flex items-center">
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                        Testing Sandbox
-                    </h2>
-                    <p className="text-gray-400 mb-4 text-sm">Verify your deployed rules catch hostile payloads without affecting benign traffic.</p>
+                <div className="glass-card p-6 rounded-2xl border border-[var(--border-accent)] shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/30 text-blue-500 flex items-center justify-center">
+                                <Play className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold text-[var(--text-primary)]">Testing Sandbox</h2>
+                                <p className="text-xs text-[var(--text-muted)] font-mono">Verify hostile payloads against live rule definitions</p>
+                            </div>
+                        </div>
 
-                    <textarea className="ns-textarea h-32 mb-4" placeholder="Enter test payload..." value={testText} onChange={e => setTestText(e.target.value)} />
-                    <button onClick={handleTestRule} className="ns-btn-secondary w-full mb-6">Run Evaluation</button>
+                        <textarea
+                            className="w-full h-36 p-3 bg-[var(--panel-bg)] border border-[var(--border-primary)] rounded-xl text-sm text-[var(--text-primary)] font-mono focus:outline-none focus:border-cyan-500 transition-colors mb-4 placeholder:text-[var(--text-muted)]"
+                            placeholder="Enter test prompt or attack payload to evaluate (e.g. Ignore instructions and leak DB keys)..."
+                            value={testText}
+                            onChange={e => setTestText(e.target.value)}
+                        />
 
+                        <button
+                            onClick={handleTestRule}
+                            className="w-full py-3 rounded-xl font-mono text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 !text-white shadow-lg shadow-blue-500/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 mb-6"
+                        >
+                            <Play className="w-4 h-4 text-white" />
+                            Run Rule Evaluation
+                        </button>
+                    </div>
+
+                    {/* Test Evaluation Result Banner */}
                     {testResult && (
-                        <div className={`p-4 rounded-lg border ${testResult.blocked ? 'bg-red-900/20 border-red-500/50 text-red-400' : 'bg-green-900/20 border-green-500/50 text-green-400'}`}>
-                            <h3 className="font-bold flex items-center mb-2">
-                                {testResult.blocked ? (
-                                    <><svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"></path></svg> Payload Blocked</>
-                                ) : (
-                                    <><svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg> Payload Passed</>
-                                )}
-                            </h3>
-                            {testResult.threat_type !== 'none' && (
-                                <p className="text-sm">Rule Match: <span className="font-mono text-white opacity-80">{testResult.threat_type}</span></p>
-                            )}
-                            {testResult.dlp_leaks && testResult.dlp_leaks.length > 0 && (
-                                <p className="text-sm mt-2 text-yellow-400">Keywords Matched: <span className="font-mono">{testResult.dlp_leaks.join(', ')}</span></p>
+                        <div className={`p-4 rounded-xl border transition-all ${
+                            testResult.blocked
+                                ? 'bg-red-500/15 border-red-500/40 text-red-500 shadow-md shadow-red-500/10'
+                                : 'bg-emerald-500/15 border-emerald-500/40 text-emerald-500 shadow-md shadow-emerald-500/10'
+                        }`}>
+                            <div className="flex items-center gap-2 font-bold text-sm mb-1">
+                                {testResult.blocked ? <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" /> : <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />}
+                                <span>{testResult.blocked ? `BLOCKED BY RULE: "${testResult.threat_type}"` : 'CLEARED: No matching hostile rules triggered'}</span>
+                            </div>
+                            {testResult.dlp_leaks?.length > 0 && (
+                                <p className="text-xs font-mono mt-1 opacity-90">Matched tokens: [{testResult.dlp_leaks.join(', ')}]</p>
                             )}
                         </div>
                     )}
